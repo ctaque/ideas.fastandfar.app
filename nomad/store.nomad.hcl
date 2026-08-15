@@ -1,7 +1,7 @@
 variable "image" {
   type        = string
-  description = "Docker image reference for the store app (e.g. localhost:5555/store:latest)"
-  default     = "localhost:5555/store:latest"
+  description = "Docker image reference for the store app (e.g. docker-hub.fastandfar.app/ctaque/store:latest)"
+  default     = "docker-hub.fastandfar.app/ctaque/store:latest"
 }
 
 job "store" {
@@ -69,6 +69,8 @@ job "store" {
         data        = <<-EOT
           RAILS_MASTER_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .RAILS_MASTER_KEY }}{{ end }}
           ANTHROPIC_API_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .ANTHROPIC_API_KEY }}{{ end }}
+          DOCKER_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_USERNAME }}{{ end }}
+          DOCKER_PASSWORD={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_PASSWORD }}{{ end }}
         EOT
         destination = "secrets/env.env"
         env         = true
