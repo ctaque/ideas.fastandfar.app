@@ -59,7 +59,8 @@ jobs:
       - name: Deploy Nomad job over SSH
         run: |
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "NOMAD_TOKEN=${{ secrets.NOMAD_TOKEN }} nomad job run \
+            "export NOMAD_TOKEN=${{ secrets.NOMAD_TOKEN }}; \
+              nomad job run \
               -var=image=${{ env.IMAGE }}:${{ github.sha }} \
               -var=\"docker_username=\$(nomad var get -item=DOCKER_USERNAME nomad/jobs/store)\" \
               -var=\"docker_password=\$(nomad var get -item=DOCKER_PASSWORD nomad/jobs/store)\" \
