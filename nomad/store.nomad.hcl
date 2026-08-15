@@ -14,7 +14,6 @@ variable "docker_password" {
   type        = string
   description = "Password for pulling the image from the private Docker registry"
   default     = ""
-  sensitive   = true
 }
 
 job "store" {
