@@ -37,7 +37,7 @@ job "store" {
       mode = "host"
 
       port "http" {
-        static = 8082
+        static = 8085
       }
     }
 
@@ -80,6 +80,7 @@ job "store" {
 
       env {
         SOLID_QUEUE_IN_PUMA = "true"
+        HTTP_PORT           = "${NOMAD_PORT_http}"
       }
 
       template {
@@ -88,7 +89,6 @@ job "store" {
           ANTHROPIC_API_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .ANTHROPIC_API_KEY }}{{ end }}
           DOCKER_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_USERNAME }}{{ end }}
           DOCKER_PASSWORD={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_PASSWORD }}{{ end }}
-          STORE_JWT_PUBLIC_KEY="{{ with nomadVar "nomad/jobs/store" }}{{ .STORE_JWT_PUBLIC_KEY }}{{ end }}"
           DB_HOST={{ with nomadVar "nomad/jobs/store" }}{{ .DB_HOST }}{{ end }}
           DB_PORT={{ with nomadVar "nomad/jobs/store" }}{{ .DB_PORT }}{{ end }}
           DB_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DB_USERNAME }}{{ end }}
