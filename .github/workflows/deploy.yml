@@ -46,16 +46,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Set up Nomad CLI
-        uses: hashicorp/setup-nomad@v1.0.0
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          version: latest
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy Nomad job
-        env:
-          NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
-          NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+      - name: Add server to known_hosts
         run: |
-          nomad job run \
-            -var="image=${{ env.IMAGE }}:${{ github.sha }}" \
-            nomad/store.nomad.hcl
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy Nomad job over SSH
+        run: |
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "nomad job run -var=image=${{ env.IMAGE }}:${{ github.sha }} -" \
+            < nomad/store.nomad.hcl
