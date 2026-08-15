@@ -71,6 +71,7 @@ job "store" {
           ANTHROPIC_API_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .ANTHROPIC_API_KEY }}{{ end }}
           DOCKER_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_USERNAME }}{{ end }}
           DOCKER_PASSWORD={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_PASSWORD }}{{ end }}
+          STORE_JWT_PUBLIC_KEY="{{ with nomadVar "nomad/jobs/store" }}{{ .STORE_JWT_PUBLIC_KEY }}{{ end }}"
         EOT
         destination = "secrets/env.env"
         env         = true
