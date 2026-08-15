@@ -79,20 +79,23 @@ job "store" {
       }
 
       env {
-        SOLID_QUEUE_IN_PUMA = "true"
-        HTTP_PORT           = "${NOMAD_PORT_http}"
+        HTTP_PORT   = "${NOMAD_PORT_http}"
+        TARGET_PORT = "13000"
       }
 
       template {
         data        = <<-EOT
           RAILS_MASTER_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .RAILS_MASTER_KEY }}{{ end }}
+          SECRET_KEY_BASE={{ with nomadVar "nomad/jobs/store" }}{{ .SECRET_KEY_BASE }}{{ end }}
           ANTHROPIC_API_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .ANTHROPIC_API_KEY }}{{ end }}
           DOCKER_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_USERNAME }}{{ end }}
           DOCKER_PASSWORD={{ with nomadVar "nomad/jobs/store" }}{{ .DOCKER_PASSWORD }}{{ end }}
+          STORE_JWT_PUBLIC_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .STORE_JWT_PUBLIC_KEY.Value | base64Decode | toJSON }}{{ end }}
           DB_HOST={{ with nomadVar "nomad/jobs/store" }}{{ .DB_HOST }}{{ end }}
           DB_PORT={{ with nomadVar "nomad/jobs/store" }}{{ .DB_PORT }}{{ end }}
           DB_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DB_USERNAME }}{{ end }}
           DB_PASSWORD={{ with nomadVar "nomad/jobs/store" }}{{ .DB_PASSWORD }}{{ end }}
+          STORE_LOGIN_BRIDGE_URL={{ with nomadVar "nomad/jobs/store" }}{{ .STORE_LOGIN_BRIDGE_URL }}{{ end }}
         EOT
         destination = "secrets/env.env"
         env         = true
@@ -105,3 +108,4 @@ job "store" {
     }
   }
 }
+
