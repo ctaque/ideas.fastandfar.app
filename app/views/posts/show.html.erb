@@ -1,7 +1,7 @@
 <% content_for :title, @post.title %>
 
 <div class="container">
-  <%= link_to "← Back to posts", posts_path, class: "back-link" %>
+  <%= link_to "← Back to ideas", posts_path, class: "back-link" %>
 
   <div style="display: flex; gap: 16px; align-items: flex-start;">
     <%= render "votes/widget", post: @post %>
@@ -21,7 +21,7 @@
   </div>
 
   <div class="content-box">
-    <div class="content-box-header">Post</div>
+    <div class="content-box-header">Idea</div>
     <div class="content-box-body"><%= @post.content %></div>
   </div>
 

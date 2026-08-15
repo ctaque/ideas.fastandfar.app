@@ -1,8 +1,8 @@
-<% content_for :title, "Posts" %>
+<% content_for :title, "Ideas" %>
 
 <div class="container">
   <div class="page-header">
-    <h1>Posts</h1>
+    <h1>Ideas</h1>
 
     <div style="display: flex; gap: 8px;">
       <% sort_labels = { "new" => "Newest", "top" => "Top", "updated" => "Recently updated" } %>
@@ -19,7 +19,7 @@
         </div>
       </details>
 
-      <%= link_to "New post", new_post_path, class: "btn btn-primary" %>
+      <%= link_to "New idea", new_post_path, class: "btn btn-primary" %>
     </div>
   </div>
 
@@ -27,7 +27,7 @@
     <% if @posts.any? %>
       <%= render @posts %>
     <% else %>
-      <div class="empty-state">No posts yet — be the first to write one.</div>
+      <div class="empty-state">No ideas yet — be the first to write one.</div>
     <% end %>
   </div>
 
