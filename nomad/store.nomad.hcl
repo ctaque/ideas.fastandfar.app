@@ -37,7 +37,7 @@ job "store" {
       mode = "host"
 
       port "http" {
-        static = 3000
+        static = 8082
       }
     }
 
