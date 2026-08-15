@@ -10,10 +10,10 @@
       })();
     </script>
 
-    <title><%= content_for(:title) || "Store" %></title>
+    <title><%= content_for(:title) || "Planche à idées" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Store">
+    <meta name="application-name" content="Planche à idées">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -35,8 +35,8 @@
   <body>
     <header class="gh-header">
       <%= link_to root_path, class: "brand" do %>
-        <span class="brand-mark">S</span>
-        Store
+        <span class="brand-mark">P</span>
+        Planche à idées
       <% end %>
 
       <div class="actions">
