@@ -4,6 +4,19 @@ variable "image" {
   default     = "docker-hub.fastandfar.app/ctaque/store:latest"
 }
 
+variable "docker_username" {
+  type        = string
+  description = "Username for pulling the image from the private Docker registry"
+  default     = ""
+}
+
+variable "docker_password" {
+  type        = string
+  description = "Password for pulling the image from the private Docker registry"
+  default     = ""
+  sensitive   = true
+}
+
 job "store" {
   datacenters = ["dc1"]
   type        = "service"
@@ -54,6 +67,11 @@ job "store" {
       config {
         image = var.image
         ports = ["http"]
+
+        auth {
+          username = var.docker_username
+          password = var.docker_password
+        }
       }
 
       volume_mount {
