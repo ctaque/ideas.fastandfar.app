@@ -1,8 +1,11 @@
-<div id="<%= dom_id comment %>">
-  <p>
-    <strong><%= comment.user.email_address %>:</strong>
-    <%= comment.comment %>
-  </p>
+<div id="<%= dom_id comment %>" class="timeline-item">
+  <%= avatar_for(comment.user_email, size: 32) %>
 
-  <%= button_to "Delete", [ comment.post, comment ], method: :delete, form: { style: "display:inline" } %>
+  <div class="timeline-content">
+    <div class="timeline-content-header">
+      <strong><%= comment.user_email %></strong>
+      <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger" %>
+    </div>
+    <div class="timeline-content-body"><%= comment.comment %></div>
+  </div>
 </div>

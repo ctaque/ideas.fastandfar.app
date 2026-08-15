@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script>
+      (function () {
+        var theme = localStorage.getItem("theme");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+      })();
+    </script>
+
     <title><%= content_for(:title) || "Store" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,22 +27,141 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%= stylesheet_link_tag "simple", "data-turbo-track": "reload" %>
-
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
   </head>
 
   <body>
-    <nav>
-      <% if authenticated? %>
-        <%= link_to "Mon profil", edit_profile_path %>
-        <%= button_to "Se déconnecter", session_path, method: :delete %>
-      <% else %>
-        <%= link_to "Se connecter", new_session_path %>
+    <header class="gh-header">
+      <%= link_to root_path, class: "brand" do %>
+        <span class="brand-mark">S</span>
+        Store
       <% end %>
-    </nav>
+
+      <div class="actions">
+        <details class="dropdown theme-switcher">
+          <summary class="btn btn-sm" aria-label="Changer de thème">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+              <path d="M8 1.7a6.3 6.3 0 0 1 0 12.6Z" fill="currentColor"></path>
+            </svg>
+          </summary>
+
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-label">Thème</div>
+
+            <button type="button" class="dropdown-item theme-option" data-theme-value="light" role="menuitemradio">
+              <svg class="theme-option-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+                <circle cx="8" cy="8" r="3"></circle>
+                <line x1="8" y1="0.5" x2="8" y2="2.5"></line>
+                <line x1="8" y1="13.5" x2="8" y2="15.5"></line>
+                <line x1="0.5" y1="8" x2="2.5" y2="8"></line>
+                <line x1="13.5" y1="8" x2="15.5" y2="8"></line>
+                <line x1="2.6" y1="2.6" x2="4" y2="4"></line>
+                <line x1="12" y1="12" x2="13.4" y2="13.4"></line>
+                <line x1="2.6" y1="13.4" x2="4" y2="12"></line>
+                <line x1="12" y1="4" x2="13.4" y2="2.6"></line>
+              </svg>
+              Clair
+              <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
+            </button>
+
+            <button type="button" class="dropdown-item theme-option" data-theme-value="dark" role="menuitemradio">
+              <svg class="theme-option-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M14 9.5A6.5 6.5 0 0 1 6.5 2 6.5 6.5 0 1 0 14 9.5Z"></path>
+              </svg>
+              Sombre
+              <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
+            </button>
+
+            <button type="button" class="dropdown-item theme-option" data-theme-value="system" role="menuitemradio">
+              <svg class="theme-option-icon" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+                <path d="M8 1.7a6.3 6.3 0 0 1 0 12.6Z" fill="currentColor"></path>
+              </svg>
+              Système
+              <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
+            </button>
+          </div>
+        </details>
+
+        <% if authenticated? %>
+          <details class="dropdown user-menu">
+            <summary aria-label="Menu utilisateur">
+              <%= avatar_for(Current.user.email_address, size: 28) %>
+            </summary>
+
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-label">
+                Connecté en tant que<br>
+                <strong><%= Current.user.email_address %></strong>
+              </div>
+            </div>
+          </details>
+        <% else %>
+          <%= link_to "Se connecter", sso_bridge_url, class: "btn btn-primary btn-sm" %>
+        <% end %>
+      </div>
+    </header>
+
+    <% if notice %>
+      <div class="container" style="padding-bottom: 0;"><p class="flash flash-notice"><%= notice %></p></div>
+    <% end %>
+    <% if alert %>
+      <div class="container" style="padding-bottom: 0;"><p class="flash flash-alert"><%= alert %></p></div>
+    <% end %>
 
     <%= yield %>
+
+    <script>
+      (function () {
+        function applyTheme(theme) {
+          if (theme === "light" || theme === "dark") {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+          } else {
+            document.documentElement.removeAttribute("data-theme");
+            localStorage.removeItem("theme");
+          }
+
+          document.querySelectorAll(".theme-option").forEach(function (option) {
+            option.setAttribute("aria-checked", option.dataset.themeValue === theme ? "true" : "false");
+          });
+        }
+
+        function initDropdowns() {
+          document.querySelectorAll(".dropdown").forEach(function (dropdown) {
+            if (dropdown.dataset.bound) return;
+            dropdown.dataset.bound = "true";
+
+            dropdown.querySelectorAll(".theme-option").forEach(function (option) {
+              option.addEventListener("click", function () {
+                applyTheme(option.dataset.themeValue);
+              });
+            });
+
+            dropdown.querySelectorAll(".dropdown-item").forEach(function (item) {
+              item.addEventListener("click", function () {
+                dropdown.removeAttribute("open");
+              });
+            });
+          });
+
+          applyTheme(localStorage.getItem("theme") || "system");
+        }
+
+        if (!window.__dropdownsOutsideClickBound) {
+          window.__dropdownsOutsideClickBound = true;
+          document.addEventListener("click", function (event) {
+            document.querySelectorAll(".dropdown[open]").forEach(function (dropdown) {
+              if (!dropdown.contains(event.target)) dropdown.removeAttribute("open");
+            });
+          });
+        }
+
+        initDropdowns();
+        document.addEventListener("turbo:load", initDropdowns);
+      })();
+    </script>
   </body>
 </html>

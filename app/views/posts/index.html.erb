@@ -1,16 +1,51 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Posts" %>
 
-<h1>Posts</h1>
+<div class="container">
+  <div class="page-header">
+    <h1>Posts</h1>
 
-<div id="posts">
-  <% @posts.each do |post| %>
-    <%= render post %>
-    <p>
-      <%= link_to "Show this post", post %>
-    </p>
+    <div style="display: flex; gap: 8px;">
+      <% sort_labels = { "new" => "Newest", "top" => "Top", "updated" => "Recently updated" } %>
+      <details class="dropdown">
+        <summary class="btn btn-sm">
+          Sort: <%= sort_labels[@sort] %>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 6h8l-4 5Z"></path></svg>
+        </summary>
+
+        <div class="dropdown-menu" role="menu">
+          <% sort_labels.each do |value, label| %>
+            <%= link_to label, posts_path(sort: value), class: "dropdown-item #{"active" if @sort == value}" %>
+          <% end %>
+        </div>
+      </details>
+
+      <%= link_to "New post", new_post_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <div id="posts" class="list-box">
+    <% if @posts.any? %>
+      <%= render @posts %>
+    <% else %>
+      <div class="empty-state">No posts yet — be the first to write one.</div>
+    <% end %>
+  </div>
+
+  <% if @total_pages > 1 %>
+    <div class="pagination">
+      <% if @page > 1 %>
+        <%= link_to "← Previous", posts_path(sort: @sort, page: @page - 1), class: "btn btn-sm" %>
+      <% else %>
+        <span class="btn btn-sm" aria-disabled="true">← Previous</span>
+      <% end %>
+
+      <span class="pagination-info">Page <%= @page %> of <%= @total_pages %></span>
+
+      <% if @page < @total_pages %>
+        <%= link_to "Next →", posts_path(sort: @sort, page: @page + 1), class: "btn btn-sm" %>
+      <% else %>
+        <span class="btn btn-sm" aria-disabled="true">Next →</span>
+      <% end %>
+    </div>
   <% end %>
 </div>
-
-<%= link_to "New post", new_post_path %>

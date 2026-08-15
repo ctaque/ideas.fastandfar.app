@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_160715) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_173617) do
   create_table "comments", force: :cascade do |t|
     t.text "comment"
     t.datetime "created_at", null: false
     t.integer "post_id", null: false
     t.datetime "updated_at", null: false
+    t.string "user_email", null: false
     t.integer "user_id", null: false
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
@@ -26,29 +27,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_160715) do
     t.datetime "created_at", null: false
     t.text "title"
     t.datetime "updated_at", null: false
+    t.string "user_email", null: false
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
-  create_table "sessions", force: :cascade do |t|
+  create_table "votes", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "ip_address"
+    t.integer "post_id", null: false
     t.datetime "updated_at", null: false
-    t.string "user_agent"
+    t.string "user_email", null: false
     t.integer "user_id", null: false
-    t.index ["user_id"], name: "index_sessions_on_user_id"
-  end
-
-  create_table "users", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "email_address", null: false
-    t.string "password_digest", null: false
-    t.datetime "updated_at", null: false
-    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.integer "value", null: false
+    t.index ["post_id", "user_id"], name: "index_votes_on_post_id_and_user_id", unique: true
+    t.index ["post_id"], name: "index_votes_on_post_id"
+    t.index ["user_id"], name: "index_votes_on_user_id"
   end
 
   add_foreign_key "comments", "posts"
-  add_foreign_key "comments", "users"
-  add_foreign_key "posts", "users"
-  add_foreign_key "sessions", "users"
+  add_foreign_key "votes", "posts"
 end

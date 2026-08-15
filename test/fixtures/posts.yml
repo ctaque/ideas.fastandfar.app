@@ -3,9 +3,11 @@
 one:
   title: MyText
   content: MyText
-  user: one
+  user_id: 1
+  user_email: one@example.com
 
 two:
   title: MyText
   content: MyText
-  user: two
+  user_id: 2
+  user_email: two@example.com

@@ -1,9 +1,15 @@
 module Authentication
   extend ActiveSupport::Concern
 
+  # The Rust service's SSO bridge: mints a fresh access_token and bounces back to
+  # return_to when the visitor already has a valid Rust session, otherwise sends
+  # them to the login page. Rails has no local login form of its own — identity is
+  # entirely owned by fastandfarapp.
+  BRIDGE_URL = ENV.fetch("STORE_LOGIN_BRIDGE_URL", "http://localhost:8080/api/store/bridge")
+
   included do
     before_action :require_authentication
-    helper_method :authenticated?
+    helper_method :authenticated?, :sso_bridge_url
   end
 
   class_methods do
@@ -14,39 +20,32 @@ module Authentication
 
   private
     def authenticated?
-      resume_session
+      resume_authentication
     end
 
     def require_authentication
-      resume_session || request_authentication
+      resume_authentication || request_authentication
     end
 
-    def resume_session
-      Current.session ||= find_session_by_cookie
+    # Reads and verifies the `access_token` cookie minted by the Rust service. Rails
+    # never writes this cookie — it only ever trusts what it can verify with the
+    # public key, and defers to Rust for everything else (issuance, revocation).
+    def resume_authentication
+      Current.user ||= user_from_access_token
     end
 
-    def find_session_by_cookie
-      Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+    def user_from_access_token
+      claims = JsonWebToken.decode(cookies[:access_token])
+      return unless claims
+
+      AuthenticatedUser.new(id: claims["sub"].to_i, email_address: claims["email"])
     end
 
     def request_authentication
-      session[:return_to_after_authenticating] = request.url
-      redirect_to new_session_path
+      redirect_to sso_bridge_url, allow_other_host: true
     end
 
-    def after_authentication_url
-      session.delete(:return_to_after_authenticating) || root_url
-    end
-
-    def start_new_session_for(user)
-      user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
-        Current.session = session
-        cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
-      end
-    end
-
-    def terminate_session
-      Current.session.destroy
-      cookies.delete(:session_id)
+    def sso_bridge_url(return_to: request.original_url)
+      "#{BRIDGE_URL}?return_to=#{CGI.escape(return_to)}"
     end
 end

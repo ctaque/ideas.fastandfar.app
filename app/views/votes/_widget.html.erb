@@ -1,0 +1,20 @@
+<%
+  current_vote = post.vote_by(Current.user)
+%>
+<div class="vote-widget">
+  <%= button_to post_vote_path(post), params: { value: 1 }, method: :post,
+        class: "vote-btn #{"active-up" if current_vote&.value == 1}",
+        form: { class: "vote-form" },
+        aria: { label: "Upvote", pressed: (current_vote&.value == 1).to_s } do %>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3 14 12H2Z"></path></svg>
+  <% end %>
+
+  <span class="vote-score"><%= post.score %></span>
+
+  <%= button_to post_vote_path(post), params: { value: -1 }, method: :post,
+        class: "vote-btn #{"active-down" if current_vote&.value == -1}",
+        form: { class: "vote-form" },
+        aria: { label: "Downvote", pressed: (current_vote&.value == -1).to_s } do %>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 13 2 4h12Z"></path></svg>
+  <% end %>
+</div>

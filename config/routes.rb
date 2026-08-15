@@ -1,9 +1,7 @@
 Rails.application.routes.draw do
-  resource :session
-  resource :profile, only: %i[ edit update ]
-  resources :passwords, param: :token
   resources :posts do
     resources :comments, only: %i[ create destroy ]
+    resource :vote, only: %i[ create ]
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

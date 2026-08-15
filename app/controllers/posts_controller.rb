@@ -1,9 +1,19 @@
 class PostsController < ApplicationController
+  SORT_OPTIONS = %w[ new top updated ].freeze
+  PER_PAGE = 10
+
   before_action :set_post, only: %i[ show edit update destroy ]
 
   # GET /posts or /posts.json
   def index
-    @posts = Post.all
+    @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "new"
+
+    @total_pages = [ (Post.count.to_f / PER_PAGE).ceil, 1 ].max
+    @page = params[:page].to_i.clamp(1, @total_pages)
+
+    page_ids = sorted_post_ids(@sort).offset((@page - 1) * PER_PAGE).limit(PER_PAGE).pluck(:id)
+    posts_by_id = Post.includes(:votes).where(id: page_ids).index_by(&:id)
+    @posts = page_ids.map { |id| posts_by_id[id] }
   end
 
   # GET /posts/1 or /posts/1.json
@@ -21,7 +31,7 @@ class PostsController < ApplicationController
 
   # POST /posts or /posts.json
   def create
-    @post = Current.user.posts.build(post_params)
+    @post = Post.new(post_params.merge(user_id: Current.user.id, user_email: Current.user.email_address))
 
     respond_to do |format|
       if @post.save
@@ -61,6 +71,17 @@ class PostsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_post
       @post = Post.find(params.expect(:id))
+    end
+
+    def sorted_post_ids(sort)
+      case sort
+      when "top"
+        Post.left_joins(:votes).group(:id).order(Arel.sql("COALESCE(SUM(votes.value), 0) DESC, posts.id DESC"))
+      when "updated"
+        Post.order(updated_at: :desc)
+      else
+        Post.order(created_at: :desc)
+      end
     end
 
     # Only allow a list of trusted parameters through.

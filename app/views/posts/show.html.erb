@@ -1,19 +1,35 @@
-<p style="color: green"><%= notice %></p>
-<p style="color: red"><%= alert %></p>
+<% content_for :title, @post.title %>
 
-<%= render @post %>
+<div class="container">
+  <%= link_to "← Back to posts", posts_path, class: "back-link" %>
 
-<div>
-  <%= link_to "Edit this post", edit_post_path(@post) %> |
-  <%= link_to "Back to posts", posts_path %>
+  <div style="display: flex; gap: 16px; align-items: flex-start;">
+    <%= render "votes/widget", post: @post %>
 
-  <%= button_to "Destroy this post", @post, method: :delete %>
+    <div style="flex: 1; min-width: 0;">
+      <h1 class="issue-title"><%= @post.title %></h1>
+      <div class="issue-meta">
+        <%= avatar_for(@post.user_email, size: 20) %>
+        <span><%= @post.user_email %> posted on <%= @post.created_at.strftime("%b %d, %Y") %></span>
+      </div>
+
+      <div class="issue-actions">
+        <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
+        <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger", form: { data: { turbo_confirm: "Are you sure?" } } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-box">
+    <div class="content-box-header">Post</div>
+    <div class="content-box-body"><%= @post.content %></div>
+  </div>
+
+  <h2><%= pluralize(@post.comments.count, "comment") %></h2>
+
+  <div id="comments">
+    <%= render @post.comments %>
+  </div>
+
+  <%= render "comments/form", post: @post, comment: @post.comments.build %>
 </div>
-
-<h2>Comments</h2>
-
-<div id="comments">
-  <%= render @post.comments %>
-</div>
-
-<%= render "comments/form", post: @post, comment: @post.comments.build %>

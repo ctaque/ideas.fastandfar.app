@@ -1,12 +1,14 @@
-<div id="<%= dom_id post %>">
-  <div>
-    <strong>Title:</strong>
-    <%= post.title %>
-  </div>
+<div id="<%= dom_id post %>" class="list-row">
+  <%= render "votes/widget", post: post %>
 
-  <div>
-    <strong>Content:</strong>
-    <%= post.content %>
+  <div class="list-row-body">
+    <%= link_to post.title, post, class: "list-row-title" %>
+    <p class="list-row-excerpt"><%= post.content %></p>
+    <div class="list-row-meta">
+      <%= avatar_for(post.user_email, size: 16) %>
+      <%= post.user_email %>
+      <span>&middot;</span>
+      <span><%= post.created_at.strftime("%b %d, %Y") %></span>
+    </div>
   </div>
-
 </div>

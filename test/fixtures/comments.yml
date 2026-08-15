@@ -2,10 +2,12 @@
 
 one:
   comment: MyText
-  user: one
+  user_id: 1
+  user_email: one@example.com
   post: one
 
 two:
   comment: MyText
-  user: two
+  user_id: 2
+  user_email: two@example.com
   post: two

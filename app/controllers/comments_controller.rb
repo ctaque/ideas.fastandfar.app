@@ -4,7 +4,8 @@ class CommentsController < ApplicationController
   # POST /posts/1/comments
   def create
     @comment = @post.comments.build(comment_params)
-    @comment.user = Current.user
+    @comment.user_id = Current.user.id
+    @comment.user_email = Current.user.email_address
 
     if @comment.save
       redirect_to @post, notice: "Comment was successfully added."
