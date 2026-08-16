@@ -50,7 +50,7 @@ class CommentModerator
       tool_use = response.content.find { |block| block.type == :tool_use }
       input = tool_use.input
 
-      Result.new(flagged: input["flagged"], category: input["category"], reason: input["reason"])
+      Result.new(flagged: input[:flagged], category: input[:category], reason: input[:reason])
     rescue Anthropic::Errors::Error => e
       Rails.logger.warn("CommentModerator: Claude API call failed, allowing comment through (#{e.class}: #{e.message})")
       Result.new(flagged: false, category: "none", reason: "moderation unavailable")
