@@ -4,7 +4,9 @@
   <div class="timeline-content">
     <div class="timeline-content-header">
       <strong><%= comment.user_email %></strong>
-      <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger" %>
+      <% if comment.user_id == Current.user.id || Current.user.admin? %>
+        <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger" %>
+      <% end %>
     </div>
     <div class="timeline-content-body"><%= comment.comment %></div>
   </div>

@@ -16,7 +16,10 @@ class CommentsController < ApplicationController
 
   # DELETE /posts/1/comments/1
   def destroy
-    @post.comments.find(params.expect(:id)).destroy!
+    comment = @post.comments.find(params.expect(:id))
+    head :forbidden and return unless comment.user_id == Current.user.id || Current.user.admin?
+
+    comment.destroy!
     redirect_to @post, notice: "Comment was successfully destroyed.", status: :see_other
   end
 
