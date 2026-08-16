@@ -465,7 +465,31 @@ input:focus, textarea:focus {
   margin-bottom: 16px;
 }
 
-.issue-actions { display: flex; gap: 8px; margin-bottom: 24px; }
+.issue-actions { display: flex; gap: 8px; align-items: center; margin-bottom: 24px; }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 2em;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.status-open { background: var(--color-accent-subtle); color: var(--color-accent); }
+.status-planned { background: var(--color-accent-subtle); color: var(--color-accent); }
+.status-in-progress { background: #fff8c5; color: #9a6700; }
+.status-completed { background: var(--color-success); color: #fff; }
+.status-closed { background: var(--color-canvas-subtle); color: var(--color-fg-muted); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .status-in-progress { background: #3a2f00; color: #e3b341; }
+}
+:root[data-theme="dark"] .status-in-progress { background: #3a2f00; color: #e3b341; }
+
+.status-dropdown > summary.status-badge { cursor: pointer; }
+.status-dropdown > summary.status-badge:hover { filter: brightness(0.95); }
 
 .content-box {
   border: 1px solid var(--color-border);

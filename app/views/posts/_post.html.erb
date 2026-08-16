@@ -3,6 +3,9 @@
 
   <div class="list-row-body">
     <%= link_to post.title, post, class: "list-row-title" %>
+    <% unless post.open? %>
+      <span class="<%= status_badge_class(post.status) %>"><%= status_label(post.status) %></span>
+    <% end %>
     <p class="list-row-excerpt"><%= post.content %></p>
     <div class="list-row-meta">
       <%= avatar_for(post.user_email, size: 16) %>

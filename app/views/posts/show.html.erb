@@ -14,6 +14,24 @@
       </div>
 
       <div class="issue-actions">
+        <% if Current.user.admin? %>
+          <details class="dropdown status-dropdown">
+            <summary class="<%= status_badge_class(@post.status) %>">
+              <%= status_label(@post.status) %>
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 6h8l-4 5Z"></path></svg>
+            </summary>
+
+            <div class="dropdown-menu" role="menu">
+              <% Post.statuses.each_key do |status| %>
+                <%= button_to status_label(status), post_status_path(@post), method: :patch, params: { status: status },
+                      class: "dropdown-item #{"active" if @post.status == status}" %>
+              <% end %>
+            </div>
+          </details>
+        <% else %>
+          <span class="<%= status_badge_class(@post.status) %>"><%= status_label(@post.status) %></span>
+        <% end %>
+
         <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
         <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger", form: { data: { turbo_confirm: "Are you sure?" } } %>
       </div>

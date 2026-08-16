@@ -3,7 +3,7 @@ require "test_helper"
 class PostsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @post = posts(:one)
-    sign_in_as(AuthenticatedUser.new(id: @post.user_id, email_address: @post.user_email))
+    sign_in_as(AuthenticatedUser.new(id: @post.user_id, email_address: @post.user_email, admin: false))
   end
 
   test "should get index" do

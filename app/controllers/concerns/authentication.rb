@@ -38,7 +38,7 @@ module Authentication
       claims = JsonWebToken.decode(cookies[:access_token])
       return unless claims
 
-      AuthenticatedUser.new(id: claims["sub"].to_i, email_address: claims["email"])
+      AuthenticatedUser.new(id: claims["sub"].to_i, email_address: claims["email"], admin: claims["admin"] == true)
     end
 
     def request_authentication

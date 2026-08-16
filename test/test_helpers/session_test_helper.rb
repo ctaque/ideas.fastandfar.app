@@ -7,6 +7,7 @@ module SessionTestHelper
     payload = {
       sub: user.id.to_s,
       email: user.email_address,
+      admin: user.admin?,
       iss: JsonWebToken::ISSUER,
       aud: JsonWebToken::AUDIENCE,
       iat: Time.now.to_i,
