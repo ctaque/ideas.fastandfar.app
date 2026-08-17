@@ -1,13 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  comment: MyText
   user_id: 1
   user_email: one@example.com
   post: one
 
 two:
-  comment: MyText
   user_id: 2
   user_email: two@example.com
   post: two
