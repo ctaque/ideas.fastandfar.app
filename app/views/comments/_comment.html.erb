@@ -1,9 +1,9 @@
 <div id="<%= dom_id comment %>" class="timeline-item">
-  <%= avatar_for(comment.user_email, size: 32) %>
+  <%= avatar_for(comment.user_email, comment.user_nickname, size: 32) %>
 
   <div class="timeline-content">
     <div class="timeline-content-header">
-      <strong><%= comment.user_email %></strong>
+      <strong><%= display_name_for(comment.user_email, comment.user_nickname) %></strong>
       <% if comment.user_id == Current.user.id || Current.user.admin? %>
         <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger" %>
       <% end %>

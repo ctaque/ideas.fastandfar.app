@@ -6,6 +6,7 @@ class CommentsController < ApplicationController
     @comment = @post.comments.build(comment_params)
     @comment.user_id = Current.user.id
     @comment.user_email = Current.user.email_address
+    @comment.user_nickname = Current.user.nickname
 
     if @comment.save
       redirect_to @post, notice: "Comment was successfully added."

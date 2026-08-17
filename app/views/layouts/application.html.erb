@@ -89,13 +89,13 @@
         <% if authenticated? %>
           <details class="dropdown user-menu">
             <summary aria-label="Menu utilisateur">
-              <%= avatar_for(Current.user.email_address, size: 28) %>
+              <%= avatar_for(Current.user.email_address, Current.user.nickname, size: 28) %>
             </summary>
 
             <div class="dropdown-menu" role="menu">
               <div class="dropdown-label">
                 Connecté en tant que<br>
-                <strong><%= Current.user.email_address %></strong>
+                <strong><%= Current.user.display_name %></strong>
               </div>
               <div class="dropdown-divider"></div>
               <%= link_to "fastandfar.app", "https://fastandfar.app", class: "dropdown-item", target: "_blank", rel: "noopener" %>

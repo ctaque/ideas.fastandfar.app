@@ -9,8 +9,8 @@
     <div style="flex: 1; min-width: 0;">
       <h1 class="issue-title"><%= @post.title %></h1>
       <div class="issue-meta">
-        <%= avatar_for(@post.user_email, size: 20) %>
-        <span><%= @post.user_email %> posted on <%= @post.created_at.strftime("%b %d, %Y") %></span>
+        <%= avatar_for(@post.user_email, @post.user_nickname, size: 20) %>
+        <span><%= display_name_for(@post.user_email, @post.user_nickname) %> posted on <%= @post.created_at.strftime("%b %d, %Y") %></span>
       </div>
 
       <div class="issue-actions">
