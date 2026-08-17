@@ -55,7 +55,10 @@
     <% if @posts.any? %>
       <%= render @posts %>
     <% else %>
-      <div class="empty-state">No ideas yet — be the first to write one.</div>
+      <div class="empty-state">
+        <%= image_tag "elephant.svg", class: "empty-state-icon", alt: "" %>
+        <div>No ideas yet — be the first to write one.</div>
+      </div>
     <% end %>
   </div>
 
