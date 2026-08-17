@@ -96,6 +96,10 @@ job "store" {
           DB_USERNAME={{ with nomadVar "nomad/jobs/store" }}{{ .DB_USERNAME }}{{ end }}
           DB_PASSWORD={{ with nomadVar "nomad/jobs/store" }}{{ .DB_PASSWORD }}{{ end }}
           STORE_LOGIN_BRIDGE_URL={{ with nomadVar "nomad/jobs/store" }}{{ .STORE_LOGIN_BRIDGE_URL }}{{ end }}
+          AWS_ACCESS_KEY_ID={{ with nomadVar "nomad/jobs/store" }}{{ .AWS_ACCESS_KEY_ID }}{{ end }}
+          AWS_SECRET_ACCESS_KEY={{ with nomadVar "nomad/jobs/store" }}{{ .AWS_SECRET_ACCESS_KEY }}{{ end }}
+          AWS_REGION={{ with nomadVar "nomad/jobs/store" }}{{ .AWS_REGION }}{{ end }}
+          AWS_BUCKET={{ with nomadVar "nomad/jobs/store" }}{{ .AWS_BUCKET }}{{ end }}
         EOT
         destination = "secrets/env.env"
         env         = true

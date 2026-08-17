@@ -5,6 +5,7 @@ class Post < ApplicationRecord
 
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
+  has_rich_text :content
 
   enum :status, {
     open: "open",
@@ -21,7 +22,7 @@ class Post < ApplicationRecord
   }, validate: true
 
   validates :user_id, :user_email, presence: true
-  validate :not_flagged_by_moderation, if: -> { title.present? || content.present? }
+  validate :not_flagged_by_moderation, if: -> { title.present? || content? }
 
   def score
     votes.sum(&:value)
@@ -33,7 +34,7 @@ class Post < ApplicationRecord
 
   private
     def not_flagged_by_moderation
-      result = PostModerator.call(title, content)
+      result = PostModerator.call(title, content.to_plain_text)
       errors.add(:base, "was flagged as #{result.category} and can't be posted") if result.flagged
     end
 end

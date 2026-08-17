@@ -44,6 +44,10 @@ gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
+gem "ruby-vips", "~> 2.2"
+
+# Store Active Storage files (rich text images) on Amazon S3 [https://github.com/aws/aws-sdk-ruby]
+gem "aws-sdk-s3", require: false
 
 group :development, :test do
   # Loads .env.development for local config like STORE_LOGIN_URL [https://github.com/bkeepers/dotenv]

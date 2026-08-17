@@ -2,12 +2,10 @@
 
 one:
   title: MyText
-  content: MyText
   user_id: 1
   user_email: one@example.com
 
 two:
   title: MyText
-  content: MyText
   user_id: 2
   user_email: two@example.com

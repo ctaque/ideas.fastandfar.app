@@ -7,7 +7,7 @@
     <% unless post.open? %>
       <span class="<%= status_badge_class(post.status) %>"><%= status_label(post.status) %></span>
     <% end %>
-    <p class="list-row-excerpt"><%= post.content %></p>
+    <p class="list-row-excerpt"><%= truncate(post.content.to_plain_text, length: 200) %></p>
     <div class="list-row-meta">
       <%= avatar_for(post.user_email, size: 16) %>
       <%= post.user_email %>

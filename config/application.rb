@@ -16,6 +16,10 @@ module Store
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Generate Active Storage variants (rich text image thumbnails) with libvips,
+    # which the production Dockerfile already installs as a system package.
+    config.active_storage.variant_processor = :vips
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
