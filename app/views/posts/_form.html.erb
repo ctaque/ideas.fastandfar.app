@@ -12,6 +12,11 @@
   <% end %>
 
   <div class="field">
+    <%= form.label :type %>
+    <%= form.select :type, Post.types.keys.map { |type| [ type_label(type), type ] } %>
+  </div>
+
+  <div class="field">
     <%= form.label :title %>
     <%= form.textarea :title %>
   </div>

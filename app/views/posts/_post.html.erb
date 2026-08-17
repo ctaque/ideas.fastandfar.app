@@ -3,6 +3,7 @@
 
   <div class="list-row-body">
     <%= link_to post.title, post, class: "list-row-title" %>
+    <span class="<%= type_badge_class(post.type) %>"><%= type_label(post.type) %></span>
     <% unless post.open? %>
       <span class="<%= status_badge_class(post.status) %>"><%= status_label(post.status) %></span>
     <% end %>

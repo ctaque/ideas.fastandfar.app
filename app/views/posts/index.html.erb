@@ -3,6 +3,20 @@
 <div class="container">
   <div class="page-header" style="justify-content: flex-end;">
     <div style="display: flex; gap: 8px;">
+      <details class="dropdown">
+        <summary class="btn btn-sm">
+          Type: <%= @type ? type_label(@type) : "All" %>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 6h8l-4 5Z"></path></svg>
+        </summary>
+
+        <div class="dropdown-menu" role="menu">
+          <%= link_to "All", posts_path(sort: @sort), class: "dropdown-item #{"active" if @type.nil?}" %>
+          <% Post.types.each_key do |type| %>
+            <%= link_to type_label(type), posts_path(sort: @sort, type: type), class: "dropdown-item #{"active" if @type == type}" %>
+          <% end %>
+        </div>
+      </details>
+
       <% sort_labels = { "new" => "Newest", "top" => "Top", "updated" => "Recently updated" } %>
       <details class="dropdown">
         <summary class="btn btn-sm">
@@ -12,7 +26,7 @@
 
         <div class="dropdown-menu" role="menu">
           <% sort_labels.each do |value, label| %>
-            <%= link_to label, posts_path(sort: value), class: "dropdown-item #{"active" if @sort == value}" %>
+            <%= link_to label, posts_path(sort: value, type: @type), class: "dropdown-item #{"active" if @sort == value}" %>
           <% end %>
         </div>
       </details>
@@ -32,7 +46,7 @@
   <% if @total_pages > 1 %>
     <div class="pagination">
       <% if @page > 1 %>
-        <%= link_to "← Previous", posts_path(sort: @sort, page: @page - 1), class: "btn btn-sm" %>
+        <%= link_to "← Previous", posts_path(sort: @sort, type: @type, page: @page - 1), class: "btn btn-sm" %>
       <% else %>
         <span class="btn btn-sm" aria-disabled="true">← Previous</span>
       <% end %>
@@ -40,7 +54,7 @@
       <span class="pagination-info">Page <%= @page %> of <%= @total_pages %></span>
 
       <% if @page < @total_pages %>
-        <%= link_to "Next →", posts_path(sort: @sort, page: @page + 1), class: "btn btn-sm" %>
+        <%= link_to "Next →", posts_path(sort: @sort, type: @type, page: @page + 1), class: "btn btn-sm" %>
       <% else %>
         <span class="btn btn-sm" aria-disabled="true">Next →</span>
       <% end %>

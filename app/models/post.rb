@@ -1,4 +1,8 @@
 class Post < ApplicationRecord
+  # The posts table has a real "type" column for Idea/Feature/Bug, not
+  # Rails single-table inheritance, so disable the STI discriminator.
+  self.inheritance_column = :_type_disabled
+
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
 
@@ -8,6 +12,12 @@ class Post < ApplicationRecord
     in_progress: "in_progress",
     completed: "completed",
     closed: "closed"
+  }, validate: true
+
+  enum :type, {
+    idea: "idea",
+    feature: "feature",
+    bug: "bug"
   }, validate: true
 
   validates :user_id, :user_email, presence: true

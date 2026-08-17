@@ -482,6 +482,14 @@ input:focus, textarea:focus {
 .status-in-progress { background: #fff8c5; color: #9a6700; }
 .status-completed { background: var(--color-success); color: #fff; }
 .status-closed { background: var(--color-canvas-subtle); color: var(--color-fg-muted); }
+.status-idea { background: var(--color-accent-subtle); color: var(--color-accent); }
+.status-feature { background: var(--color-success); color: #fff; }
+.status-bug { background: #ffebe9; color: #cf222e; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .status-bug { background: #4c1310; color: #ff7b72; }
+}
+:root[data-theme="dark"] .status-bug { background: #4c1310; color: #ff7b72; }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .status-in-progress { background: #3a2f00; color: #e3b341; }

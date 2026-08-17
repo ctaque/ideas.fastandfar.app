@@ -7,11 +7,14 @@ class PostsController < ApplicationController
   # GET /posts or /posts.json
   def index
     @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "new"
+    @type = Post.types.key?(params[:type]) ? params[:type] : nil
 
-    @total_pages = [ (Post.count.to_f / PER_PAGE).ceil, 1 ].max
+    scope = @type ? Post.where(type: @type) : Post.all
+
+    @total_pages = [ (scope.count.to_f / PER_PAGE).ceil, 1 ].max
     @page = params[:page].to_i.clamp(1, @total_pages)
 
-    page_ids = sorted_post_ids(@sort).offset((@page - 1) * PER_PAGE).limit(PER_PAGE).pluck(:id)
+    page_ids = sorted_post_ids(scope, @sort).offset((@page - 1) * PER_PAGE).limit(PER_PAGE).pluck(:id)
     posts_by_id = Post.includes(:votes).where(id: page_ids).index_by(&:id)
     @posts = page_ids.map { |id| posts_by_id[id] }
   end
@@ -73,19 +76,19 @@ class PostsController < ApplicationController
       @post = Post.find(params.expect(:id))
     end
 
-    def sorted_post_ids(sort)
+    def sorted_post_ids(scope, sort)
       case sort
       when "top"
-        Post.left_joins(:votes).group(:id).order(Arel.sql("COALESCE(SUM(votes.value), 0) DESC, posts.id DESC"))
+        scope.left_joins(:votes).group(:id).order(Arel.sql("COALESCE(SUM(votes.value), 0) DESC, posts.id DESC"))
       when "updated"
-        Post.order(updated_at: :desc)
+        scope.order(updated_at: :desc)
       else
-        Post.order(created_at: :desc)
+        scope.order(created_at: :desc)
       end
     end
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.expect(post: [ :title, :content ])
+      params.expect(post: [ :title, :content, :type ])
     end
 end

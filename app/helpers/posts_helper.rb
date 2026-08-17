@@ -14,4 +14,18 @@ module PostsHelper
   def status_badge_class(status)
     "status-badge status-#{status.dasherize}"
   end
+
+  TYPE_LABELS = {
+    "idea" => "Idea",
+    "feature" => "Feature",
+    "bug" => "Bug"
+  }.freeze
+
+  def type_label(type)
+    TYPE_LABELS.fetch(type, type.to_s.humanize)
+  end
+
+  def type_badge_class(type)
+    "status-badge status-#{type.dasherize}"
+  end
 end
