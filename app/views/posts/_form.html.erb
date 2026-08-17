@@ -45,5 +45,7 @@
     <%= form.rich_text_area :content %>
   </div>
 
-  <%= form.submit class: "btn btn-primary" %>
+  <% verb = post.new_record? ? "Create" : "Update" %>
+  <%= form.submit "#{verb} #{type_label(post.type)}", class: "btn btn-primary",
+        data: { role: "type-submit-btn", verb: verb } %>
 <% end %>

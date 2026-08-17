@@ -1,8 +1,8 @@
 <% content_for :title, "Editing idea" %>
 
 <div class="container-form">
-  <%= link_to "← Back to ideas", posts_path, class: "back-link" %>
-  <div class="page-header"><h1>Editing idea</h1></div>
+  <%= link_to "← Back to list", posts_path, class: "back-link" %>
+  <div class="page-header"><h1>Editing <span data-role="type-page-title"><%= @post.type %></span></h1></div>
 
   <div class="settings-section">
     <%= render "form", post: @post %>

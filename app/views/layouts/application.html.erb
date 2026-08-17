@@ -163,6 +163,12 @@
                   dropdown.querySelectorAll(".type-select-option").forEach(function (opt) {
                     opt.classList.toggle("active", opt === option);
                   });
+
+                  var pageTitleWord = document.querySelector('[data-role="type-page-title"]');
+                  if (pageTitleWord) pageTitleWord.textContent = option.dataset.value;
+
+                  var submitBtn = document.querySelector('[data-role="type-submit-btn"]');
+                  if (submitBtn) submitBtn.value = submitBtn.dataset.verb + " " + option.dataset.label;
                 });
               });
             }
