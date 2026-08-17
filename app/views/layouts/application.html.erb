@@ -186,8 +186,36 @@
           });
         }
 
+        function initDeleteConfirmButtons() {
+          document.querySelectorAll('[data-role="delete-confirm-btn"]').forEach(function (btn) {
+            if (btn.dataset.bound) return;
+            btn.dataset.bound = "true";
+
+            btn.addEventListener("click", function (event) {
+              if (btn.dataset.armed === "true") return;
+              event.preventDefault();
+              btn.dataset.armed = "true";
+              btn.textContent = btn.dataset.confirmLabel;
+            });
+          });
+        }
+
+        if (!window.__deleteConfirmOutsideClickBound) {
+          window.__deleteConfirmOutsideClickBound = true;
+          document.addEventListener("click", function (event) {
+            document.querySelectorAll('[data-role="delete-confirm-btn"][data-armed="true"]').forEach(function (btn) {
+              if (btn !== event.target) {
+                btn.dataset.armed = "false";
+                btn.textContent = btn.dataset.defaultLabel;
+              }
+            });
+          });
+        }
+
         initDropdowns();
+        initDeleteConfirmButtons();
         document.addEventListener("turbo:load", initDropdowns);
+        document.addEventListener("turbo:load", initDeleteConfirmButtons);
       })();
     </script>
   </body>

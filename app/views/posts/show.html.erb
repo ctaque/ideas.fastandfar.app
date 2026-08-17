@@ -35,7 +35,8 @@
         <% end %>
 
         <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
-        <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger", form: { data: { turbo_confirm: "Are you sure?" } } %>
+        <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
+              data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
       </div>
     </div>
   </div>
