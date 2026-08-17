@@ -10,9 +10,25 @@
         </summary>
 
         <div class="dropdown-menu" role="menu">
-          <%= link_to "All", posts_path(sort: @sort), class: "dropdown-item #{"active" if @type.nil?}" %>
+          <div class="dropdown-label">Filter by type</div>
+          <div class="dropdown-divider"></div>
+
+          <%= link_to posts_path(sort: @sort), class: "dropdown-item #{"active" if @type.nil?}" do %>
+            <span class="type-dot type-dot-all"></span>
+            All
+            <% if @type.nil? %>
+              <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
+            <% end %>
+          <% end %>
+
           <% Post.types.each_key do |type| %>
-            <%= link_to type_label(type), posts_path(sort: @sort, type: type), class: "dropdown-item #{"active" if @type == type}" %>
+            <%= link_to posts_path(sort: @sort, type: type), class: "dropdown-item #{"active" if @type == type}" do %>
+              <span class="type-dot type-dot-<%= type %>"></span>
+              <%= type_label(type) %>
+              <% if @type == type %>
+                <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
+              <% end %>
+            <% end %>
           <% end %>
         </div>
       </details>

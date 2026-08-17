@@ -484,12 +484,17 @@ input:focus, textarea:focus {
 .status-closed { background: var(--color-canvas-subtle); color: var(--color-fg-muted); }
 .status-idea { background: var(--color-accent-subtle); color: var(--color-accent); }
 .status-feature { background: var(--color-success); color: #fff; }
-.status-bug { background: #ffebe9; color: #cf222e; }
+.status-bug { background: color-mix(in srgb, var(--color-danger) 15%, var(--color-canvas)); color: var(--color-danger); }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .status-bug { background: #4c1310; color: #ff7b72; }
-}
-:root[data-theme="dark"] .status-bug { background: #4c1310; color: #ff7b72; }
+/* Type filter dropdown */
+
+.type-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.type-dot-idea { background: var(--color-accent); }
+.type-dot-feature { background: var(--color-success); }
+.type-dot-bug { background: var(--color-danger); }
+.type-dot-all { background: transparent; border: 1px solid var(--color-border); }
+
+.dropdown-item .check { margin-left: auto; flex-shrink: 0; }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .status-in-progress { background: #3a2f00; color: #e3b341; }
