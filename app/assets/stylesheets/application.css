@@ -496,6 +496,10 @@ input:focus, textarea:focus {
 
 .dropdown-item .check { margin-left: auto; flex-shrink: 0; }
 
+.type-select > summary.btn { justify-content: flex-start; min-width: 160px; }
+.type-select-option .check { visibility: hidden; }
+.type-select-option.active .check { visibility: visible; }
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .status-in-progress { background: #3a2f00; color: #e3b341; }
 }

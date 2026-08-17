@@ -148,6 +148,24 @@
                 dropdown.removeAttribute("open");
               });
             });
+
+            if (dropdown.classList.contains("type-select")) {
+              var input = dropdown.querySelector('input[type="hidden"]');
+              var dot = dropdown.querySelector('summary [data-role="dot"]');
+              var label = dropdown.querySelector('summary [data-role="label"]');
+
+              dropdown.querySelectorAll(".type-select-option").forEach(function (option) {
+                option.addEventListener("click", function () {
+                  input.value = option.dataset.value;
+                  label.textContent = option.dataset.label;
+                  dot.className = "type-dot type-dot-" + option.dataset.value;
+
+                  dropdown.querySelectorAll(".type-select-option").forEach(function (opt) {
+                    opt.classList.toggle("active", opt === option);
+                  });
+                });
+              });
+            }
           });
 
           applyTheme(localStorage.getItem("theme") || "system");
