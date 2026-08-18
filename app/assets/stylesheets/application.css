@@ -610,6 +610,9 @@ trix-editor {
   background: var(--color-canvas);
   color: var(--color-fg);
   margin-bottom: 16px;
+  min-height: 15em;
+  resize: vertical;
+  overflow: auto;
 }
 trix-editor:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
 
