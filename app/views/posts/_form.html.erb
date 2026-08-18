@@ -42,7 +42,7 @@
 
   <div class="field">
     <%= form.label :content %>
-    <%= form.rich_text_area :content %>
+    <%= form.rich_text_area :content, placeholder: "Use @ to mention" %>
   </div>
 
   <% verb = post.new_record? ? "Create" : "Update" %>

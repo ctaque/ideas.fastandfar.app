@@ -2,7 +2,7 @@
   <%= form_with model: comment, url: post_comments_path(post), local: true do |form| %>
     <div class="field">
       <%= form.label :comment, "Add a comment" %>
-      <%= form.rich_text_area :comment %>
+      <%= form.rich_text_area :comment, placeholder: "Use @ to mention" %>
     </div>
 
     <%= form.submit "Comment", class: "btn btn-primary" %>
