@@ -38,6 +38,7 @@ class PostsController < ApplicationController
 
     respond_to do |format|
       if @post.save
+        MentionNotifier.notify(@post.content, post_id: @post.id, access_token: cookies[:access_token])
         format.html { redirect_to @post, notice: "Post was successfully created." }
         format.json { render :show, status: :created, location: @post }
       else

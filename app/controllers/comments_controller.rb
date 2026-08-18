@@ -9,6 +9,7 @@ class CommentsController < ApplicationController
     @comment.user_nickname = Current.user.nickname
 
     if @comment.save
+      MentionNotifier.notify(@comment.comment, post_id: @post.id, comment_id: @comment.id, access_token: cookies[:access_token])
       redirect_to @post, notice: "Comment was successfully added."
     else
       redirect_to @post, alert: @comment.errors.full_messages.to_sentence
