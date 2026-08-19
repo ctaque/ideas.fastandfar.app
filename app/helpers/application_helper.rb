@@ -19,4 +19,26 @@ module ApplicationHelper
   def display_name_for(email, nickname)
     nickname.presence || email
   end
+
+  # Compact relative time (e.g. "5h ago", "1mo ago"), unlike distance_of_time_in_words'
+  # verbose "about 5 hours" style.
+  def time_ago_short(time)
+    seconds = (Time.current - time).to_i
+    return "just now" if seconds < 60
+
+    minutes = seconds / 60
+    return "#{minutes}m ago" if minutes < 60
+
+    hours = minutes / 60
+    return "#{hours}h ago" if hours < 24
+
+    days = hours / 24
+    return "#{days}d ago" if days < 30
+
+    months = days / 30
+    return "#{months}mo ago" if months < 12
+
+    years = days / 365
+    "#{years}y ago"
+  end
 end

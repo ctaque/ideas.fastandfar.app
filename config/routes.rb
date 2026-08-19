@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :posts do
-    resources :comments, only: %i[ create destroy ]
+    resources :comments, only: %i[ create update destroy ]
     resource :vote, only: %i[ create ]
     resource :subscription, only: %i[ create ]
     resource :status, only: %i[ update ], controller: "post_statuses"

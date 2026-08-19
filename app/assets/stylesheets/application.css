@@ -540,7 +540,7 @@ input:focus, textarea:focus {
   color: var(--color-fg-muted);
 }
 .content-box-body {
-  padding: 16px;
+  padding: 0 16px;
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
@@ -572,7 +572,7 @@ input:focus, textarea:focus {
   font-size: 13px;
 }
 .timeline-content-body {
-  padding: 16px;
+  padding: 0 16px;
   font-size: 14px;
   white-space: pre-wrap;
   overflow-wrap: break-word;
@@ -584,6 +584,12 @@ input:focus, textarea:focus {
   padding: 16px;
   background: var(--color-canvas);
 }
+
+.comment-edit-form { padding: 0 16px 16px; }
+
+.comment-edited { color: var(--color-fg-muted); font-weight: 400; margin-left: 4px; }
+
+.hidden { display: none; }
 
 /* Settings */
 

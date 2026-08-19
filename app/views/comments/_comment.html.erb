@@ -3,12 +3,31 @@
 
   <div class="timeline-content">
     <div class="timeline-content-header">
-      <strong><%= display_name_for(comment.user_email, comment.user_nickname) %></strong>
+      <span>
+        <strong><%= display_name_for(comment.user_email, comment.user_nickname) %></strong>
+        <% if comment.edited_at? %>
+          <span class="comment-edited" title="<%= comment.edited_at.strftime("%b %d, %Y at %H:%M") %>">Edited <%= time_ago_short(comment.edited_at) %></span>
+        <% end %>
+      </span>
       <% if comment.user_id == Current.user.id || Current.user.admin? %>
-        <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger",
-              data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-sm" data-role="edit-comment-btn" data-target="<%= dom_id(comment, :edit_form) %>">Edit</button>
+          <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger",
+                data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
+        </div>
       <% end %>
     </div>
     <div class="timeline-content-body"><%= comment.comment %></div>
+
+    <% if comment.user_id == Current.user.id || Current.user.admin? %>
+      <div id="<%= dom_id(comment, :edit_form) %>" class="comment-edit-form hidden">
+        <%= form_with model: [ comment.post, comment ], method: :patch, local: true, class: "comment-form-box" do |form| %>
+          <div class="field">
+            <%= form.rich_text_area :comment %>
+          </div>
+          <%= form.submit "Save", class: "btn btn-primary btn-sm" %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>

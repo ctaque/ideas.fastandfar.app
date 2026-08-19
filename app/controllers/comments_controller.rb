@@ -1,5 +1,7 @@
 class CommentsController < ApplicationController
   before_action :set_post
+  before_action :set_comment, only: %i[ update destroy ]
+  before_action :require_author_or_admin, only: %i[ update destroy ]
 
   # POST /posts/1/comments
   def create
@@ -17,18 +19,32 @@ class CommentsController < ApplicationController
     end
   end
 
+  # PATCH/PUT /posts/1/comments/1
+  def update
+    if @comment.update(comment_params.merge(edited_at: Time.current))
+      redirect_to @post, notice: "Comment was successfully updated."
+    else
+      redirect_to @post, alert: @comment.errors.full_messages.to_sentence
+    end
+  end
+
   # DELETE /posts/1/comments/1
   def destroy
-    comment = @post.comments.find(params.expect(:id))
-    head :forbidden and return unless comment.user_id == Current.user.id || Current.user.admin?
-
-    comment.destroy!
+    @comment.destroy!
     redirect_to @post, notice: "Comment was successfully destroyed.", status: :see_other
   end
 
   private
     def set_post
       @post = Post.find(params.expect(:post_id))
+    end
+
+    def set_comment
+      @comment = @post.comments.find(params.expect(:id))
+    end
+
+    def require_author_or_admin
+      head :forbidden unless @comment.user_id == Current.user.id || Current.user.admin?
     end
 
     def comment_params

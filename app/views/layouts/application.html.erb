@@ -213,10 +213,24 @@
           });
         }
 
+        function initCommentEditToggles() {
+          document.querySelectorAll('[data-role="edit-comment-btn"]').forEach(function (btn) {
+            if (btn.dataset.bound) return;
+            btn.dataset.bound = "true";
+
+            btn.addEventListener("click", function () {
+              var form = document.getElementById(btn.dataset.target);
+              if (form) form.classList.toggle("hidden");
+            });
+          });
+        }
+
         initDropdowns();
         initDeleteConfirmButtons();
+        initCommentEditToggles();
         document.addEventListener("turbo:load", initDropdowns);
         document.addEventListener("turbo:load", initDeleteConfirmButtons);
+        document.addEventListener("turbo:load", initCommentEditToggles);
       })();
     </script>
   </body>
