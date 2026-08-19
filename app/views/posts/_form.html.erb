@@ -11,33 +11,35 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :type %>
-    <details class="dropdown type-select">
-      <%= form.hidden_field :type %>
+  <div class="field-row">
+    <div class="field field-type">
+      <%= form.label :type %>
+      <details class="dropdown type-select">
+        <%= form.hidden_field :type %>
 
-      <summary class="btn btn-sm">
-        <span class="type-dot type-dot-<%= post.type %>" data-role="dot"></span>
-        <span data-role="label"><%= type_label(post.type) %></span>
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 6h8l-4 5Z"></path></svg>
-      </summary>
+        <summary class="btn btn-sm">
+          <span class="type-dot type-dot-<%= post.type %>" data-role="dot"></span>
+          <span data-role="label"><%= type_label(post.type) %></span>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 6h8l-4 5Z"></path></svg>
+        </summary>
 
-      <div class="dropdown-menu" role="menu">
-        <% Post.types.each_key do |type| %>
-          <button type="button" class="dropdown-item type-select-option <%= "active" if post.type == type %>"
-                  data-value="<%= type %>" data-label="<%= type_label(type) %>">
-            <span class="type-dot type-dot-<%= type %>"></span>
-            <%= type_label(type) %>
-            <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
-          </button>
-        <% end %>
-      </div>
-    </details>
-  </div>
+        <div class="dropdown-menu" role="menu">
+          <% Post.types.each_key do |type| %>
+            <button type="button" class="dropdown-item type-select-option <%= "active" if post.type == type %>"
+                    data-value="<%= type %>" data-label="<%= type_label(type) %>">
+              <span class="type-dot type-dot-<%= type %>"></span>
+              <%= type_label(type) %>
+              <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
+            </button>
+          <% end %>
+        </div>
+      </details>
+    </div>
 
-  <div class="field">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
+    <div class="field field-title">
+      <%= form.label :title %>
+      <%= form.text_field :title %>
+    </div>
   </div>
 
   <div class="field">

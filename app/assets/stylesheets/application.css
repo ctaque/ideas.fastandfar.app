@@ -304,6 +304,10 @@ input:focus, textarea:focus {
 .field { margin-bottom: 16px; }
 .field-hint { font-size: 12px; color: var(--color-fg-muted); margin-top: -12px; margin-bottom: 16px; }
 
+.field-row { display: flex; gap: 16px; align-items: flex-start; }
+.field-row .field-type { flex-shrink: 0; }
+.field-row .field-title { flex: 1; min-width: 0; }
+
 .error-box {
   border: 1px solid var(--color-danger);
   background: color-mix(in srgb, var(--color-danger) 10%, var(--color-canvas));
@@ -530,7 +534,7 @@ input:focus, textarea:focus {
 
 .type-select { display: inline-block; }
 .type-select > summary.btn { justify-content: flex-start; }
-.type-select .dropdown-menu { left: 0; right: auto; }
+.type-select .dropdown-menu { left: 0; right: auto; min-width: 196px; }
 .type-select-option .check { visibility: hidden; }
 .type-select-option.active .check { visibility: visible; }
 
@@ -551,6 +555,7 @@ input:focus, textarea:focus {
 .content-box-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 8px 16px;
   background: var(--color-canvas-subtle);
@@ -559,7 +564,7 @@ input:focus, textarea:focus {
   color: var(--color-fg-muted);
 }
 .content-box-body {
-  padding: 0 16px 16px;
+  padding: 16px;
   overflow-wrap: break-word;
 }
 

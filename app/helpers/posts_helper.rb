@@ -17,7 +17,7 @@ module PostsHelper
 
   TYPE_LABELS = {
     "idea" => "Idea",
-    "feature" => "Feature",
+    "feature" => "Feature Request",
     "bug" => "Bug"
   }.freeze
 

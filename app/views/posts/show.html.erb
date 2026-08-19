@@ -29,12 +29,6 @@
         <% else %>
           <span class="<%= status_badge_class(@post.status) %>"><%= status_label(@post.status) %></span>
         <% end %>
-
-        <% if @post.user_id == Current.user.id || Current.user.admin? %>
-          <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
-          <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
-                data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
-        <% end %>
       </div>
     </div>
   </div>
@@ -42,9 +36,19 @@
   <div class="post-layout">
     <div class="post-content">
       <div class="content-box">
-        <div class="content-box-header issue-meta">
-          <%= avatar_for(@post.user_email, @post.user_nickname, @post.user_avatar_url, size: 20) %>
-          <span><%= display_name_for(@post.user_email, @post.user_nickname) %> posted on <%= @post.created_at.strftime("%b %d, %Y") %></span>
+        <div class="content-box-header">
+          <span class="issue-meta" style="margin-bottom: 0;">
+            <%= avatar_for(@post.user_email, @post.user_nickname, @post.user_avatar_url, size: 20) %>
+            <%= display_name_for(@post.user_email, @post.user_nickname) %> posted on <%= @post.created_at.strftime("%b %d, %Y") %>
+          </span>
+
+          <% if @post.user_id == Current.user.id || Current.user.admin? %>
+            <div style="display: flex; gap: 8px;">
+              <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
+              <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
+                    data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
+            </div>
+          <% end %>
         </div>
         <div class="content-box-body"><%= @post.content %></div>
       </div>
