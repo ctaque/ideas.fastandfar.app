@@ -5,7 +5,8 @@
     <div class="timeline-content-header">
       <strong><%= display_name_for(comment.user_email, comment.user_nickname) %></strong>
       <% if comment.user_id == Current.user.id || Current.user.admin? %>
-        <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger" %>
+        <%= button_to "Delete", [ comment.post, comment ], method: :delete, class: "btn btn-sm btn-danger",
+              data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
       <% end %>
     </div>
     <div class="timeline-content-body"><%= comment.comment %></div>
