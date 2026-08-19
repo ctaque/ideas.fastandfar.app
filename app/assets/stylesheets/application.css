@@ -540,8 +540,7 @@ input:focus, textarea:focus {
   color: var(--color-fg-muted);
 }
 .content-box-body {
-  padding: 0 16px;
-  white-space: pre-wrap;
+  padding: 0 16px 16px;
   overflow-wrap: break-word;
 }
 
