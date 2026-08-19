@@ -9,6 +9,7 @@ class CommentsController < ApplicationController
     @comment.user_id = Current.user.id
     @comment.user_email = Current.user.email_address
     @comment.user_nickname = Current.user.nickname
+    @comment.user_avatar_url = Current.user.avatar_url
 
     if @comment.save
       MentionNotifier.notify(@comment.comment, post_id: @post.id, comment_id: @comment.id, access_token: cookies[:access_token])

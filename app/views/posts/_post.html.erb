@@ -9,7 +9,7 @@
     <% end %>
     <p class="list-row-excerpt"><%= truncate(post.content.to_plain_text, length: 200) %></p>
     <div class="list-row-meta">
-      <%= avatar_for(post.user_email, post.user_nickname, size: 16) %>
+      <%= avatar_for(post.user_email, post.user_nickname, post.user_avatar_url, size: 16) %>
       <%= display_name_for(post.user_email, post.user_nickname) %>
       <span>&middot;</span>
       <span><%= post.created_at.strftime("%b %d, %Y") %></span>

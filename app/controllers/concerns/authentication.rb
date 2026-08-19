@@ -42,6 +42,7 @@ module Authentication
         id: claims["sub"].to_i,
         email_address: claims["email"],
         nickname: claims["nickname"],
+        avatar_url: claims["avatar_url"],
         admin: claims["admin"] == true
       )
     end

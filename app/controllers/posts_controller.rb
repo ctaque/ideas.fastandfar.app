@@ -35,7 +35,12 @@ class PostsController < ApplicationController
 
   # POST /posts or /posts.json
   def create
-    @post = Post.new(post_params.merge(user_id: Current.user.id, user_email: Current.user.email_address, user_nickname: Current.user.nickname))
+    @post = Post.new(post_params.merge(
+      user_id: Current.user.id,
+      user_email: Current.user.email_address,
+      user_nickname: Current.user.nickname,
+      user_avatar_url: Current.user.avatar_url
+    ))
 
     respond_to do |format|
       if @post.save

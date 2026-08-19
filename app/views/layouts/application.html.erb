@@ -90,7 +90,7 @@
         <% if authenticated? %>
           <details class="dropdown user-menu">
             <summary aria-label="Menu utilisateur">
-              <%= avatar_for(Current.user.email_address, Current.user.nickname, size: 28) %>
+              <%= avatar_for(Current.user.email_address, Current.user.nickname, Current.user.avatar_url, size: 28) %>
             </summary>
 
             <div class="dropdown-menu" role="menu">

@@ -1,5 +1,5 @@
 <div id="<%= dom_id comment %>" class="timeline-item">
-  <%= avatar_for(comment.user_email, comment.user_nickname, size: 32) %>
+  <%= avatar_for(comment.user_email, comment.user_nickname, comment.user_avatar_url, size: 32) %>
 
   <div class="timeline-content">
     <div class="timeline-content-header">
