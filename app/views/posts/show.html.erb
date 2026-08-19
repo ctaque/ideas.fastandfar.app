@@ -34,9 +34,11 @@
           <span class="<%= status_badge_class(@post.status) %>"><%= status_label(@post.status) %></span>
         <% end %>
 
-        <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
-        <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
-              data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
+        <% if @post.user_id == Current.user.id || Current.user.admin? %>
+          <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
+          <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
+                data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
+        <% end %>
       </div>
     </div>
   </div>

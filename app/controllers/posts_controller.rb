@@ -3,6 +3,7 @@ class PostsController < ApplicationController
   PER_PAGE = 10
 
   before_action :set_post, only: %i[ show edit update destroy ]
+  before_action :require_author_or_admin, only: %i[ edit update destroy ]
 
   # GET /posts or /posts.json
   def index
@@ -81,6 +82,10 @@ class PostsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_post
       @post = Post.find(params.expect(:id))
+    end
+
+    def require_author_or_admin
+      head :forbidden unless @post.user_id == Current.user.id || Current.user.admin?
     end
 
     def sorted_post_ids(scope, sort)
