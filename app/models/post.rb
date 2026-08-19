@@ -5,6 +5,7 @@ class Post < ApplicationRecord
 
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
+  has_many :subscriptions, dependent: :destroy
   has_rich_text :content
 
   enum :status, {
@@ -30,6 +31,10 @@ class Post < ApplicationRecord
 
   def vote_by(user)
     votes.find { |vote| vote.user_id == user.id }
+  end
+
+  def subscribed_by?(user)
+    subscriptions.any? { |subscription| subscription.user_id == user.id }
   end
 
   private

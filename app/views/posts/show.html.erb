@@ -41,16 +41,24 @@
     </div>
   </div>
 
-  <div class="content-box">
-    <div class="content-box-header">Idea</div>
-    <div class="content-box-body"><%= @post.content %></div>
+  <div class="post-layout">
+    <div class="post-main">
+      <div class="content-box">
+        <div class="content-box-header">Idea</div>
+        <div class="content-box-body"><%= @post.content %></div>
+      </div>
+
+      <h2><%= pluralize(@post.comments.count, "comment") %></h2>
+
+      <div id="comments">
+        <%= render @post.comments %>
+      </div>
+
+      <%= render "comments/form", post: @post, comment: @post.comments.build %>
+    </div>
+
+    <aside class="post-sidebar">
+      <%= render "subscriptions/button", post: @post %>
+    </aside>
   </div>
-
-  <h2><%= pluralize(@post.comments.count, "comment") %></h2>
-
-  <div id="comments">
-    <%= render @post.comments %>
-  </div>
-
-  <%= render "comments/form", post: @post, comment: @post.comments.build %>
 </div>
