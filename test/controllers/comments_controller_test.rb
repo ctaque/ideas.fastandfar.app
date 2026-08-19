@@ -41,10 +41,15 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "should allow an admin to update or destroy someone else's comment" do
+  test "should not allow an admin to update or destroy someone else's comment" do
     sign_in_as(AuthenticatedUser.new(id: @comment.user_id + 1, email_address: "admin@example.com", admin: true))
 
     patch post_comment_url(@post, @comment), params: { comment: { comment: "Moderated content" } }
-    assert_redirected_to post_url(@post)
+    assert_response :forbidden
+
+    assert_no_difference("Comment.count") do
+      delete post_comment_url(@post, @comment)
+    end
+    assert_response :forbidden
   end
 end

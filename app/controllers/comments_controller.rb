@@ -1,7 +1,7 @@
 class CommentsController < ApplicationController
   before_action :set_post
   before_action :set_comment, only: %i[ update destroy ]
-  before_action :require_author_or_admin, only: %i[ update destroy ]
+  before_action :require_author, only: %i[ update destroy ]
 
   # POST /posts/1/comments
   def create
@@ -44,8 +44,8 @@ class CommentsController < ApplicationController
       @comment = @post.comments.find(params.expect(:id))
     end
 
-    def require_author_or_admin
-      head :forbidden unless @comment.user_id == Current.user.id || Current.user.admin?
+    def require_author
+      head :forbidden unless @comment.user_id == Current.user.id
     end
 
     def comment_params
