@@ -42,13 +42,11 @@
             <%= display_name_for(@post.user_email, @post.user_nickname) %> posted on <%= @post.created_at.strftime("%b %d, %Y") %>
           </span>
 
-          <% if @post.user_id == Current.user.id || Current.user.admin? %>
+          <% if @post.user_id == Current.user.id %>
             <div style="display: flex; gap: 8px;">
               <%= link_to "Edit", edit_post_path(@post), class: "btn btn-sm" %>
-              <% if @post.user_id == Current.user.id %>
-                <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
-                      data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
-              <% end %>
+              <%= button_to "Delete", @post, method: :delete, class: "btn btn-sm btn-danger",
+                    data: { role: "delete-confirm-btn", default_label: "Delete", confirm_label: "Yes, delete" } %>
             </div>
           <% end %>
         </div>

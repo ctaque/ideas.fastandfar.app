@@ -125,18 +125,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "should allow an admin to edit or update someone else's post" do
+  test "should not allow an admin to edit, update, or destroy someone else's post" do
     sign_in_as(AuthenticatedUser.new(id: @post.user_id + 1, email_address: "admin@example.com", admin: true))
 
     get edit_post_url(@post)
-    assert_response :success
+    assert_response :forbidden
 
     patch post_url(@post), params: { post: { content: "Some content", title: @post.title } }
-    assert_redirected_to post_url(@post)
-  end
-
-  test "should not allow an admin to destroy someone else's post" do
-    sign_in_as(AuthenticatedUser.new(id: @post.user_id + 1, email_address: "admin@example.com", admin: true))
+    assert_response :forbidden
 
     assert_no_difference("Post.count") do
       delete post_url(@post)

@@ -4,8 +4,7 @@ class PostsController < ApplicationController
   DEFAULT_QUERY = "is:idea state:open"
 
   before_action :set_post, only: %i[ show edit update destroy ]
-  before_action :require_author_or_admin, only: %i[ edit update ]
-  before_action :require_author, only: %i[ destroy ]
+  before_action :require_author, only: %i[ edit update destroy ]
 
   # GET /posts or /posts.json
   def index
@@ -102,10 +101,6 @@ class PostsController < ApplicationController
 
     def require_author
       head :forbidden unless @post.user_id == Current.user.id
-    end
-
-    def require_author_or_admin
-      head :forbidden unless @post.user_id == Current.user.id || Current.user.admin?
     end
 
     # Parses a GitHub-issues-style query string such as "is:idea state:open
