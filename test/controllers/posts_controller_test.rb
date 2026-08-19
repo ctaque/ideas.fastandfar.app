@@ -41,6 +41,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes @response.body, @post.title
   end
 
+  test "should filter index by author: qualifier, matching nickname case-insensitively" do
+    @post.update!(user_nickname: "Alice")
+    other = Post.create!(title: "Someone else's idea", user_id: @post.user_id + 1,
+      user_email: "bob@example.com", user_nickname: "bob")
+
+    get posts_url(q: "author:alice")
+    assert_response :success
+    assert_includes @response.body, @post.title
+    assert_not_includes @response.body, other.title
+  end
+
   test "should filter index by title text alongside qualifiers" do
     get posts_url(q: "is:idea #{@post.title}")
     assert_response :success

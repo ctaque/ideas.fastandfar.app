@@ -11,11 +11,12 @@ class PostsController < ApplicationController
   def index
     @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "new"
     @q = params.key?(:q) ? params[:q].to_s : DEFAULT_QUERY
-    @type, @status, text = parse_query(@q)
+    @type, @status, @author, text = parse_query(@q)
 
     scope = Post.all
     scope = scope.where(type: @type) if @type
     scope = scope.where(status: @status) if @status
+    scope = scope.where("LOWER(user_nickname) = ?", @author.downcase) if @author
     scope = scope.where("LOWER(title) LIKE ? ESCAPE '\\'", "%#{Post.sanitize_sql_like(text.downcase)}%") if text.present?
 
     @total_pages = [ (scope.count.to_f / PER_PAGE).ceil, 1 ].max
@@ -103,12 +104,16 @@ class PostsController < ApplicationController
       head :forbidden unless @post.user_id == Current.user.id || Current.user.admin?
     end
 
-    # Parses a GitHub-issues-style query string such as "is:idea state:open foo"
-    # into a [type, status, remaining_text] triple. Unknown qualifiers and
-    # values are ignored; everything else is treated as a title search term.
+    # Parses a GitHub-issues-style query string such as "is:idea state:open
+    # author:bob foo" into a [type, status, author, remaining_text] tuple.
+    # Unknown is:/state: values are ignored; author accepts any nickname as-is,
+    # since Rails doesn't own the users table (fastandfarapp does) and just
+    # matches whatever it already has cached on the post. Everything else is
+    # treated as a title search term.
     def parse_query(query)
       type = nil
       status = nil
+      author = nil
       text_terms = []
 
       query.split(/\s+/).each do |token|
@@ -119,12 +124,14 @@ class PostsController < ApplicationController
         when /\Astate:(.+)\z/i
           candidate = $1.downcase.tr("-", "_")
           status = candidate if Post.statuses.key?(candidate)
+        when /\Aauthor:(.+)\z/i
+          author = $1
         else
           text_terms << token
         end
       end
 
-      [ type, status, text_terms.join(" ") ]
+      [ type, status, author, text_terms.join(" ") ]
     end
 
     def sorted_post_ids(scope, sort)

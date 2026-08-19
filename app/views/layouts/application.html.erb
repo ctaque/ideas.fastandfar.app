@@ -232,6 +232,11 @@
           });
         }
 
+        function fastandfarappOrigin() {
+          var meta = document.querySelector('meta[name="fastandfarapp-origin"]');
+          return meta ? meta.content : null;
+        }
+
         function getTextNodesIn(el) {
           var nodes = [];
           (function walk(node) {
@@ -319,21 +324,27 @@
             var hiddenField = wrap.querySelector('[data-role="search-qualifier-value"]');
             var qualifiers = [
               { key: "is", values: parseQualifierValues(editor.dataset.types) },
-              { key: "state", values: parseQualifierValues(editor.dataset.statuses) }
+              { key: "state", values: parseQualifierValues(editor.dataset.statuses) },
+              { key: "author", values: [], dynamic: true }
             ];
             var activeIndex = -1;
+            var authorDebounceTimer = null;
+            var authorRequestToken = 0;
 
             function isValidToken(token) {
-              var match = token.match(/^(is|state):(.+)$/i);
+              var match = token.match(/^(is|state|author):(.+)$/i);
               if (!match) return false;
               var qualifier = qualifiers.find(function (q) { return q.key === match[1].toLowerCase(); });
               if (!qualifier) return false;
+              // author values come from a live nickname search, not a fixed list:
+              // any non-empty value the user accepted is trusted as-is.
+              if (qualifier.dynamic) return true;
               var value = match[2].toLowerCase();
               return qualifier.values.some(function (option) { return option.value.toLowerCase() === value; });
             }
 
             function buildChip(token) {
-              var match = token.match(/^(is|state):(.+)$/i);
+              var match = token.match(/^(is|state|author):(.+)$/i);
               var chip = document.createElement("span");
               chip.className = "search-chip";
               chip.contentEditable = "false";
@@ -369,7 +380,7 @@
                   return;
                 }
 
-                var match = part.match(/^(is|state):(.*)$/i);
+                var match = part.match(/^(is|state|author):(.*)$/i);
                 if (match) {
                   editor.appendChild(document.createTextNode(match[1] + ":"));
                   var value = document.createElement("span");
@@ -503,8 +514,40 @@
               list.classList.toggle("hidden", suggestions.length === 0);
             }
 
+            function fetchAuthorSuggestions(token, valuePrefix) {
+              var origin = fastandfarappOrigin();
+              if (!origin) {
+                renderSuggestionList([], token);
+                return;
+              }
+
+              clearTimeout(authorDebounceTimer);
+              var requestToken = ++authorRequestToken;
+
+              authorDebounceTimer = setTimeout(function () {
+                fetch(origin + "/api/store/mentions/search?q=" + encodeURIComponent(valuePrefix), { credentials: "include" })
+                  .then(function (response) { return response.ok ? response.json() : { nicknames: [] }; })
+                  .then(function (data) {
+                    if (requestToken !== authorRequestToken) return; // a newer keystroke superseded this request
+
+                    var suggestions = (data.nicknames || []).map(function (nickname) {
+                      return { insert: "author:" + nickname, display: "author:" + nickname, hint: "" };
+                    });
+                    renderSuggestionList(suggestions, token);
+                  })
+                  .catch(function () { renderSuggestionList([], token); });
+              }, 150);
+            }
+
             function updateSuggestions() {
               var token = currentToken();
+              var colonIndex = token.text.indexOf(":");
+
+              if (colonIndex !== -1 && token.text.slice(0, colonIndex).toLowerCase() === "author") {
+                fetchAuthorSuggestions(token, token.text.slice(colonIndex + 1));
+                return;
+              }
+
               renderSuggestionList(computeSuggestions(token.text), token);
             }
 
