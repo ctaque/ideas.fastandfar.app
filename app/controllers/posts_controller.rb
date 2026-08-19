@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   SORT_OPTIONS = %w[ new top updated ].freeze
   PER_PAGE = 10
+  DEFAULT_QUERY = "is:idea state:open"
 
   before_action :set_post, only: %i[ show edit update destroy ]
   before_action :require_author_or_admin, only: %i[ edit update ]
@@ -9,9 +10,13 @@ class PostsController < ApplicationController
   # GET /posts or /posts.json
   def index
     @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "new"
-    @type = Post.types.key?(params[:type]) ? params[:type] : nil
+    @q = params.key?(:q) ? params[:q].to_s : DEFAULT_QUERY
+    @type, @status, text = parse_query(@q)
 
-    scope = @type ? Post.where(type: @type) : Post.all
+    scope = Post.all
+    scope = scope.where(type: @type) if @type
+    scope = scope.where(status: @status) if @status
+    scope = scope.where("LOWER(title) LIKE ? ESCAPE '\\'", "%#{Post.sanitize_sql_like(text.downcase)}%") if text.present?
 
     @total_pages = [ (scope.count.to_f / PER_PAGE).ceil, 1 ].max
     @page = params[:page].to_i.clamp(1, @total_pages)
@@ -96,6 +101,30 @@ class PostsController < ApplicationController
 
     def require_author_or_admin
       head :forbidden unless @post.user_id == Current.user.id || Current.user.admin?
+    end
+
+    # Parses a GitHub-issues-style query string such as "is:idea state:open foo"
+    # into a [type, status, remaining_text] triple. Unknown qualifiers and
+    # values are ignored; everything else is treated as a title search term.
+    def parse_query(query)
+      type = nil
+      status = nil
+      text_terms = []
+
+      query.split(/\s+/).each do |token|
+        case token
+        when /\Ais:(.+)\z/i
+          candidate = $1.downcase
+          type = candidate if Post.types.key?(candidate)
+        when /\Astate:(.+)\z/i
+          candidate = $1.downcase.tr("-", "_")
+          status = candidate if Post.statuses.key?(candidate)
+        else
+          text_terms << token
+        end
+      end
+
+      [ type, status, text_terms.join(" ") ]
     end
 
     def sorted_post_ids(scope, sort)

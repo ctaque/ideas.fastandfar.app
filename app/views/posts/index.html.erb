@@ -1,38 +1,18 @@
 <% content_for :title, "Ideas" %>
 
 <div class="container">
-  <div class="page-header" style="justify-content: flex-end;">
+  <div class="page-header" style="align-items: flex-start;">
+    <%= form_with url: posts_path, method: :get, class: "post-search-form" do %>
+      <%= hidden_field_tag :sort, @sort %>
+      <%= hidden_field_tag :q, @q, data: { role: "search-qualifier-value" } %>
+      <div class="post-search-input" contenteditable="true" role="textbox" aria-multiline="false"
+           spellcheck="false" data-role="search-qualifier-input" data-placeholder="is:idea state:open"
+           data-types="<%= Post.types.keys.map { |type| "#{type}:#{type_label(type)}" }.join(",") %>"
+           data-statuses="<%= Post.statuses.keys.map { |status| "#{status}:#{status_label(status)}" }.join(",") %>"><%= @q %></div>
+      <div class="post-search-suggestions hidden" data-role="search-suggestions" role="listbox"></div>
+    <% end %>
+
     <div style="display: flex; gap: 8px;">
-      <details class="dropdown">
-        <summary class="btn btn-sm">
-          Type: <%= @type ? type_label(@type) : "All" %>
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 6h8l-4 5Z"></path></svg>
-        </summary>
-
-        <div class="dropdown-menu" role="menu">
-          <div class="dropdown-label">Filter by type</div>
-          <div class="dropdown-divider"></div>
-
-          <%= link_to posts_path(sort: @sort), class: "dropdown-item #{"active" if @type.nil?}" do %>
-            <span class="type-dot type-dot-all"></span>
-            All
-            <% if @type.nil? %>
-              <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
-            <% end %>
-          <% end %>
-
-          <% Post.types.each_key do |type| %>
-            <%= link_to posts_path(sort: @sort, type: type), class: "dropdown-item #{"active" if @type == type}" do %>
-              <span class="type-dot type-dot-<%= type %>"></span>
-              <%= type_label(type) %>
-              <% if @type == type %>
-                <svg class="check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"></path></svg>
-              <% end %>
-            <% end %>
-          <% end %>
-        </div>
-      </details>
-
       <% sort_labels = { "new" => "Newest", "top" => "Top", "updated" => "Recently updated" } %>
       <details class="dropdown">
         <summary class="btn btn-sm">
@@ -42,7 +22,7 @@
 
         <div class="dropdown-menu" role="menu">
           <% sort_labels.each do |value, label| %>
-            <%= link_to label, posts_path(sort: value, type: @type), class: "dropdown-item #{"active" if @sort == value}" %>
+            <%= link_to label, posts_path(sort: value, q: @q), class: "dropdown-item #{"active" if @sort == value}" %>
           <% end %>
         </div>
       </details>
@@ -65,7 +45,7 @@
   <% if @total_pages > 1 %>
     <div class="pagination">
       <% if @page > 1 %>
-        <%= link_to "← Previous", posts_path(sort: @sort, type: @type, page: @page - 1), class: "btn btn-sm" %>
+        <%= link_to "← Previous", posts_path(sort: @sort, q: @q, page: @page - 1), class: "btn btn-sm" %>
       <% else %>
         <span class="btn btn-sm" aria-disabled="true">← Previous</span>
       <% end %>
@@ -73,7 +53,7 @@
       <span class="pagination-info">Page <%= @page %> of <%= @total_pages %></span>
 
       <% if @page < @total_pages %>
-        <%= link_to "Next →", posts_path(sort: @sort, type: @type, page: @page + 1), class: "btn btn-sm" %>
+        <%= link_to "Next →", posts_path(sort: @sort, q: @q, page: @page + 1), class: "btn btn-sm" %>
       <% else %>
         <span class="btn btn-sm" aria-disabled="true">Next →</span>
       <% end %>

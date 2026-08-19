@@ -225,12 +225,387 @@
           });
         }
 
+        function parseQualifierValues(str) {
+          return (str || "").split(",").filter(Boolean).map(function (pair) {
+            var idx = pair.indexOf(":");
+            return { value: pair.slice(0, idx), label: pair.slice(idx + 1) };
+          });
+        }
+
+        function getTextNodesIn(el) {
+          var nodes = [];
+          (function walk(node) {
+            if (node.nodeType === 3) {
+              nodes.push(node);
+            } else {
+              node.childNodes.forEach(walk);
+            }
+          })(el);
+          return nodes;
+        }
+
+        function getCaretOffset(el) {
+          var selection = window.getSelection();
+          if (!selection.rangeCount) return el.textContent.length;
+          var range = selection.getRangeAt(0);
+          if (!el.contains(range.startContainer)) return el.textContent.length;
+          var preRange = document.createRange();
+          preRange.selectNodeContents(el);
+          preRange.setEnd(range.endContainer, range.endOffset);
+          return preRange.toString().length;
+        }
+
+        function setCaretOffset(el, offset) {
+          var textNodes = getTextNodesIn(el);
+          var remaining = offset;
+          var target = null;
+
+          for (var i = 0; i < textNodes.length; i++) {
+            if (remaining <= textNodes[i].length) {
+              target = { node: textNodes[i], offset: remaining };
+              break;
+            }
+            remaining -= textNodes[i].length;
+          }
+
+          var range = document.createRange();
+          var selection = window.getSelection();
+
+          if (target) {
+            range.setStart(target.node, target.offset);
+          } else if (textNodes.length) {
+            var last = textNodes[textNodes.length - 1];
+            range.setStart(last, last.length);
+          } else {
+            range.setStart(el, 0);
+          }
+
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        function tokenAt(text, pos) {
+          var start = text.lastIndexOf(" ", pos - 1) + 1;
+          var end = text.indexOf(" ", pos);
+          if (end === -1) end = text.length;
+          return { text: text.slice(start, end), start: start, end: end };
+        }
+
+        function getCaretRect(el) {
+          var selection = window.getSelection();
+          if (!selection.rangeCount) return null;
+          var range = selection.getRangeAt(0);
+          if (!el.contains(range.startContainer)) return null;
+
+          var caretRange = range.cloneRange();
+          caretRange.collapse(true);
+          var rects = caretRange.getClientRects();
+          if (rects.length) return rects[0];
+
+          var rect = caretRange.getBoundingClientRect();
+          if (rect.width || rect.height || rect.top || rect.left) return rect;
+
+          return null;
+        }
+
+        function initSearchAutocomplete() {
+          document.querySelectorAll('[data-role="search-qualifier-input"]').forEach(function (editor) {
+            if (editor.dataset.bound) return;
+            editor.dataset.bound = "true";
+
+            var wrap = editor.closest(".post-search-form");
+            var list = wrap.querySelector('[data-role="search-suggestions"]');
+            var hiddenField = wrap.querySelector('[data-role="search-qualifier-value"]');
+            var qualifiers = [
+              { key: "is", values: parseQualifierValues(editor.dataset.types) },
+              { key: "state", values: parseQualifierValues(editor.dataset.statuses) }
+            ];
+            var activeIndex = -1;
+
+            function isValidToken(token) {
+              var match = token.match(/^(is|state):(.+)$/i);
+              if (!match) return false;
+              var qualifier = qualifiers.find(function (q) { return q.key === match[1].toLowerCase(); });
+              if (!qualifier) return false;
+              var value = match[2].toLowerCase();
+              return qualifier.values.some(function (option) { return option.value.toLowerCase() === value; });
+            }
+
+            function buildChip(token) {
+              var match = token.match(/^(is|state):(.+)$/i);
+              var chip = document.createElement("span");
+              chip.className = "search-chip";
+              chip.contentEditable = "false";
+
+              var qualifierLabel = document.createElement("span");
+              qualifierLabel.className = "search-chip-qualifier";
+              qualifierLabel.textContent = match[1].toLowerCase() + ":";
+              chip.appendChild(qualifierLabel);
+              chip.appendChild(document.createTextNode(match[2]));
+
+              return chip;
+            }
+
+            // Renders text into the editor as chips for completed, valid is:/state:
+            // tokens, plain highlighted text for the token currently being typed
+            // (between activeStart/activeEnd) and free-text search terms.
+            function renderQuery(text, activeStart, activeEnd) {
+              editor.textContent = "";
+              var idx = 0;
+
+              text.split(/(\s+)/).forEach(function (part) {
+                var partStart = idx;
+                idx += part.length;
+                if (part === "" || /^\s+$/.test(part)) {
+                  if (part !== "") editor.appendChild(document.createTextNode(part));
+                  return;
+                }
+
+                var isActive = activeStart != null && partStart === activeStart && partStart + part.length === activeEnd;
+
+                if (!isActive && isValidToken(part)) {
+                  editor.appendChild(buildChip(part));
+                  return;
+                }
+
+                var match = part.match(/^(is|state):(.*)$/i);
+                if (match) {
+                  editor.appendChild(document.createTextNode(match[1] + ":"));
+                  var value = document.createElement("span");
+                  value.className = "criterion-value";
+                  value.textContent = match[2];
+                  editor.appendChild(value);
+                } else {
+                  editor.appendChild(document.createTextNode(part));
+                }
+              });
+
+              hiddenField.value = text;
+            }
+
+            function currentToken() {
+              return tokenAt(editor.textContent, getCaretOffset(editor));
+            }
+
+            function computeSuggestions(text) {
+              var colonIndex = text.indexOf(":");
+              var suggestions = [];
+
+              if (colonIndex === -1) {
+                if (text.length > 0) {
+                  qualifiers.forEach(function (qualifier) {
+                    if (qualifier.key.indexOf(text.toLowerCase()) === 0) {
+                      suggestions.push({ insert: qualifier.key + ":", display: qualifier.key + ":", hint: "", bare: true });
+                    }
+                  });
+                }
+              } else {
+                var key = text.slice(0, colonIndex).toLowerCase();
+                var valuePrefix = text.slice(colonIndex + 1).toLowerCase();
+                var qualifier = qualifiers.find(function (q) { return q.key === key; });
+
+                if (qualifier) {
+                  qualifier.values.forEach(function (option) {
+                    if (option.value.toLowerCase().indexOf(valuePrefix) === 0) {
+                      suggestions.push({ insert: key + ":" + option.value, display: key + ":" + option.value, hint: option.label });
+                    }
+                  });
+                }
+              }
+
+              return suggestions;
+            }
+
+            function hideSuggestions() {
+              list.classList.add("hidden");
+              list.innerHTML = "";
+              activeIndex = -1;
+            }
+
+            function positionSuggestions() {
+              var wrapRect = wrap.getBoundingClientRect();
+              var caretRect = getCaretRect(editor);
+
+              if (caretRect) {
+                list.style.left = (caretRect.left - wrapRect.left) + "px";
+                list.style.top = (caretRect.bottom - wrapRect.top + 6) + "px";
+              } else {
+                list.style.left = "0px";
+                list.style.top = "calc(100% + 6px)";
+              }
+            }
+
+            function setActive(index) {
+              var items = list.querySelectorAll(".search-suggestion-item");
+              if (!items.length) return;
+              if (items[activeIndex]) items[activeIndex].classList.remove("active-suggestion");
+              activeIndex = (index + items.length) % items.length;
+              items[activeIndex].classList.add("active-suggestion");
+              items[activeIndex].scrollIntoView({ block: "nearest" });
+            }
+
+            function bareQualifierSuggestions() {
+              return qualifiers.map(function (qualifier) {
+                return { insert: qualifier.key + ":", display: qualifier.key + ":", hint: "", bare: true };
+              });
+            }
+
+            function applySuggestion(suggestion, token) {
+              var text = editor.textContent;
+              var before = text.slice(0, token.start);
+              var after = text.slice(token.end);
+              var separator = suggestion.bare ? "" : " ";
+              var newText = before + suggestion.insert + separator + after;
+              var caretPos = (before + suggestion.insert + separator).length;
+
+              renderQuery(newText, null, null);
+              editor.focus();
+              setCaretOffset(editor, caretPos);
+
+              if (suggestion.bare) {
+                // Accepted a bare qualifier (e.g. "is:") -> show its values.
+                updateSuggestions();
+              } else {
+                // Accepted a value (e.g. "is:idea") -> offer the available
+                // filter criteria again so another one can be chained.
+                renderSuggestionList(bareQualifierSuggestions(), currentToken());
+              }
+            }
+
+            function renderSuggestionList(suggestions, token) {
+              list.innerHTML = "";
+              activeIndex = suggestions.length ? 0 : -1;
+
+              suggestions.forEach(function (suggestion, index) {
+                var item = document.createElement("button");
+                item.type = "button";
+                item.className = "dropdown-item search-suggestion-item" + (index === 0 ? " active-suggestion" : "");
+                item.setAttribute("role", "option");
+
+                var code = document.createElement("code");
+                code.textContent = suggestion.display;
+                item.appendChild(code);
+
+                if (suggestion.hint) {
+                  var hint = document.createElement("span");
+                  hint.className = "search-suggestion-hint";
+                  hint.textContent = suggestion.hint;
+                  item.appendChild(hint);
+                }
+
+                item.addEventListener("mousedown", function (event) { event.preventDefault(); });
+                item.addEventListener("click", function () { applySuggestion(suggestion, token); });
+                list.appendChild(item);
+              });
+
+              if (suggestions.length) positionSuggestions();
+              list.classList.toggle("hidden", suggestions.length === 0);
+            }
+
+            function updateSuggestions() {
+              var token = currentToken();
+              renderSuggestionList(computeSuggestions(token.text), token);
+            }
+
+            renderQuery(editor.textContent, null, null);
+
+            editor.addEventListener("input", function () {
+              var caretOffset = getCaretOffset(editor);
+              var text = editor.textContent;
+              var token = tokenAt(text, caretOffset);
+
+              renderQuery(text, token.start, token.end);
+              setCaretOffset(editor, caretOffset);
+              updateSuggestions();
+            });
+            editor.addEventListener("focus", updateSuggestions);
+
+            editor.addEventListener("keydown", function (event) {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                if (!list.classList.contains("hidden") && activeIndex !== -1) {
+                  list.querySelectorAll(".search-suggestion-item")[activeIndex].click();
+                } else {
+                  wrap.requestSubmit();
+                }
+                return;
+              }
+
+              if (event.key === "Backspace") {
+                var selection = window.getSelection();
+                var collapsed = !selection.rangeCount || selection.getRangeAt(0).collapsed;
+
+                if (collapsed) {
+                  var caretOffset = getCaretOffset(editor);
+                  var text = editor.textContent;
+                  var precedingToken = tokenAt(text, caretOffset);
+
+                  if (precedingToken.end === caretOffset && isValidToken(precedingToken.text)) {
+                    event.preventDefault();
+
+                    var before = text.slice(0, precedingToken.start);
+                    var after = text.slice(precedingToken.end);
+                    if (after.charAt(0) === " ") {
+                      after = after.slice(1);
+                    } else if (before.charAt(before.length - 1) === " ") {
+                      before = before.slice(0, -1);
+                    }
+
+                    renderQuery(before + after, null, null);
+                    editor.focus();
+                    setCaretOffset(editor, before.length);
+                    updateSuggestions();
+                    return;
+                  }
+                }
+              }
+
+              if (list.classList.contains("hidden")) return;
+
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                setActive(activeIndex + 1);
+              } else if (event.key === "ArrowUp") {
+                event.preventDefault();
+                setActive(activeIndex - 1);
+              } else if (event.key === "Escape") {
+                hideSuggestions();
+              }
+            });
+          });
+        }
+
+        if (!window.__searchSuggestionsOutsideClickBound) {
+          window.__searchSuggestionsOutsideClickBound = true;
+          document.addEventListener("click", function (event) {
+            // Use composedPath (the path frozen at dispatch time) instead of
+            // wrap.contains(event.target): selecting a suggestion rebuilds the
+            // list and detaches the clicked button before this bubbles here,
+            // which would make a contains() check see it as "outside".
+            var path = event.composedPath ? event.composedPath() : null;
+
+            document.querySelectorAll('[data-role="search-suggestions"]:not(.hidden)').forEach(function (list) {
+              var wrap = list.closest(".post-search-form");
+              if (!wrap) return;
+
+              var insideWrap = path ? path.indexOf(wrap) !== -1 : wrap.contains(event.target);
+              if (!insideWrap) {
+                list.classList.add("hidden");
+                list.innerHTML = "";
+              }
+            });
+          });
+        }
+
         initDropdowns();
         initDeleteConfirmButtons();
         initCommentEditToggles();
+        initSearchAutocomplete();
         document.addEventListener("turbo:load", initDropdowns);
         document.addEventListener("turbo:load", initDeleteConfirmButtons);
         document.addEventListener("turbo:load", initCommentEditToggles);
+        document.addEventListener("turbo:load", initSearchAutocomplete);
       })();
     </script>
   </body>

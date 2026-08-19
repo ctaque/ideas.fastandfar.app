@@ -11,6 +11,48 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should default to is:idea state:open when no query is given" do
+    bug = Post.create!(title: "Crash on save", type: "bug", status: "closed",
+      user_id: @post.user_id, user_email: @post.user_email)
+
+    get posts_url
+    assert_response :success
+    assert_includes @response.body, @post.title
+    assert_not_includes @response.body, bug.title
+  end
+
+  test "should show all posts when the query is explicitly cleared" do
+    bug = Post.create!(title: "Crash on save", type: "bug", status: "closed",
+      user_id: @post.user_id, user_email: @post.user_email)
+
+    get posts_url(q: "")
+    assert_response :success
+    assert_includes @response.body, @post.title
+    assert_includes @response.body, bug.title
+  end
+
+  test "should filter index by is: and state: qualifiers" do
+    bug = Post.create!(title: "Crash on save", type: "bug", status: "closed",
+      user_id: @post.user_id, user_email: @post.user_email)
+
+    get posts_url(q: "is:bug state:closed")
+    assert_response :success
+    assert_includes @response.body, bug.title
+    assert_not_includes @response.body, @post.title
+  end
+
+  test "should filter index by title text alongside qualifiers" do
+    get posts_url(q: "is:idea #{@post.title}")
+    assert_response :success
+    assert_includes @response.body, @post.title
+  end
+
+  test "should ignore unknown qualifier values" do
+    get posts_url(q: "is:not-a-type state:not-a-state")
+    assert_response :success
+    assert_includes @response.body, @post.title
+  end
+
   test "should get new" do
     get new_post_url
     assert_response :success

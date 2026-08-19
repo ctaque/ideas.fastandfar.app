@@ -228,6 +228,70 @@ hr { border: none; border-top: 1px solid var(--color-border); margin: 24px 0; }
 }
 .page-header h1 { font-size: 24px; margin: 0; }
 
+.post-search-form { position: relative; flex: 1; min-width: 200px; }
+.post-search-form .post-search-input {
+  width: 100%;
+  margin-bottom: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  line-height: 22px;
+  color: var(--color-fg);
+  background: var(--color-canvas);
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+  outline: none;
+}
+.post-search-form .post-search-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.post-search-form .post-search-input:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-fg-subtle);
+}
+.post-search-form .post-search-input .criterion-value { color: var(--color-accent); }
+
+.search-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
+  border-radius: 2em;
+  padding: 0 8px;
+  margin: 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.search-chip-qualifier { color: var(--color-fg-muted); font-weight: 500; margin-right: 2px; }
+
+.post-search-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 100;
+  width: max-content;
+  min-width: 220px;
+  max-width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(140, 149, 159, .3);
+}
+
+.search-suggestion-item { display: flex; align-items: center; gap: 8px; }
+.search-suggestion-item code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.search-suggestion-item .search-suggestion-hint { margin-left: auto; color: var(--color-fg-muted); font-size: 12px; }
+.search-suggestion-item.active-suggestion { background: var(--color-canvas-subtle); }
+
 /* Buttons */
 
 .btn,
@@ -269,7 +333,7 @@ input[type="submit"] {
 .btn-danger { color: var(--color-danger); }
 .btn-danger:hover { background: var(--color-danger); border-color: var(--color-danger); color: #fff; }
 
-.btn-sm { padding: 6px 12px; font-size: 12px; line-height: 18px; }
+.btn-sm { padding: 9px 12px; font-size: 12px; line-height: 18px; }
 
 .btn-block { width: 100%; }
 
