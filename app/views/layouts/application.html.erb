@@ -515,9 +515,18 @@
             }
 
             function fetchAuthorSuggestions(token, valuePrefix) {
+              // "me" is a synthetic shortcut (resolved server-side to the current
+              // user) rather than a real nickname, so offer it instantly without
+              // waiting on the network whenever it matches what's been typed.
+              var meSuggestion = "me".indexOf(valuePrefix.toLowerCase()) === 0
+                ? [ { insert: "author:me", display: "author:me", hint: "Yourself" } ]
+                : [];
+
+              if (meSuggestion.length) renderSuggestionList(meSuggestion, token);
+
               var origin = fastandfarappOrigin();
               if (!origin) {
-                renderSuggestionList([], token);
+                if (!meSuggestion.length) renderSuggestionList([], token);
                 return;
               }
 
@@ -530,12 +539,14 @@
                   .then(function (data) {
                     if (requestToken !== authorRequestToken) return; // a newer keystroke superseded this request
 
-                    var suggestions = (data.nicknames || []).map(function (nickname) {
+                    var nicknameSuggestions = (data.nicknames || []).map(function (nickname) {
                       return { insert: "author:" + nickname, display: "author:" + nickname, hint: "" };
                     });
-                    renderSuggestionList(suggestions, token);
+                    renderSuggestionList(meSuggestion.concat(nicknameSuggestions), token);
                   })
-                  .catch(function () { renderSuggestionList([], token); });
+                  .catch(function () {
+                    if (!meSuggestion.length) renderSuggestionList([], token);
+                  });
               }, 150);
             }
 

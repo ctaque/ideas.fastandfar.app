@@ -16,7 +16,11 @@ class PostsController < ApplicationController
     scope = Post.all
     scope = scope.where(type: @type) if @type
     scope = scope.where(status: @status) if @status
-    scope = scope.where("LOWER(user_nickname) = ?", @author.downcase) if @author
+    if @author&.casecmp?("me")
+      scope = scope.where(user_id: Current.user.id)
+    elsif @author
+      scope = scope.where("LOWER(user_nickname) = ?", @author.downcase)
+    end
     scope = scope.where("LOWER(title) LIKE ? ESCAPE '\\'", "%#{Post.sanitize_sql_like(text.downcase)}%") if text.present?
 
     @total_pages = [ (scope.count.to_f / PER_PAGE).ceil, 1 ].max
