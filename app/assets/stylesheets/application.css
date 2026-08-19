@@ -473,12 +473,31 @@ input:focus, textarea:focus {
 
 .issue-actions { display: flex; gap: 8px; align-items: center; margin-bottom: 24px; }
 
-.post-layout { display: flex; gap: 32px; align-items: flex-start; }
-.post-main { flex: 1; min-width: 0; }
-.post-sidebar { width: 200px; flex-shrink: 0; }
+.post-layout {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  grid-template-areas: "content sidebar" "comments sidebar";
+  column-gap: 32px;
+  row-gap: 0;
+  align-items: start;
+}
+.post-content { grid-area: content; min-width: 0; }
+.post-comments { grid-area: comments; min-width: 0; }
+.post-sidebar { grid-area: sidebar; width: 200px; }
 .post-sidebar .btn { width: 100%; }
+
+@media (max-width: 700px) {
+  .post-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas: "content" "sidebar" "comments";
+  }
+  .post-sidebar { width: auto; margin-bottom: 24px; }
+}
 .subscribe-status { font-size: 12px; color: var(--color-fg-muted); margin-top: 8px; }
 .sidebar-label { font-size: 12px; font-weight: 600; color: var(--color-fg-muted); margin-bottom: 8px; }
+
+.participant-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.participant-list-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
 
 .status-badge {
   display: inline-flex;

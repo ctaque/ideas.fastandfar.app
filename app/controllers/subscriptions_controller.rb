@@ -9,6 +9,8 @@ class SubscriptionsController < ApplicationController
       subscription.destroy!
     else
       subscription.user_email = Current.user.email_address
+      subscription.user_nickname = Current.user.nickname
+      subscription.user_avatar_url = Current.user.avatar_url
       subscription.save!
     end
 

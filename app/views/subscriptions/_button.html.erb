@@ -28,3 +28,14 @@
     You're not receiving updates from this post
   <% end %>
 </p>
+
+<% participants = post.participants %>
+<div class="sidebar-label" style="margin-top: 16px"><%= pluralize(participants.size, "participant") %></div>
+<ul class="participant-list">
+  <% participants.each do |participant| %>
+    <li class="participant-list-item">
+      <%= avatar_for(participant.user_email, participant.user_nickname, participant.user_avatar_url, size: 20) %>
+      <span><%= display_name_for(participant.user_email, participant.user_nickname) %></span>
+    </li>
+  <% end %>
+</ul>

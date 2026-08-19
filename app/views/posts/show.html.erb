@@ -40,7 +40,7 @@
   </div>
 
   <div class="post-layout">
-    <div class="post-main">
+    <div class="post-content">
       <div class="content-box">
         <div class="content-box-header issue-meta">
           <%= avatar_for(@post.user_email, @post.user_nickname, @post.user_avatar_url, size: 20) %>
@@ -48,7 +48,13 @@
         </div>
         <div class="content-box-body"><%= @post.content %></div>
       </div>
+    </div>
 
+    <aside class="post-sidebar">
+      <%= render "subscriptions/button", post: @post %>
+    </aside>
+
+    <div class="post-comments">
       <h2><%= pluralize(@post.comments.count, "comment") %></h2>
 
       <div id="comments">
@@ -57,9 +63,5 @@
 
       <%= render "comments/form", post: @post, comment: @post.comments.build %>
     </div>
-
-    <aside class="post-sidebar">
-      <%= render "subscriptions/button", post: @post %>
-    </aside>
   </div>
 </div>

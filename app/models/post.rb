@@ -3,6 +3,8 @@ class Post < ApplicationRecord
   # Rails single-table inheritance, so disable the STI discriminator.
   self.inheritance_column = :_type_disabled
 
+  Participant = Data.define(:user_id, :user_email, :user_nickname, :user_avatar_url)
+
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
   has_many :subscriptions, dependent: :destroy
@@ -35,6 +37,30 @@ class Post < ApplicationRecord
 
   def subscribed_by?(user)
     subscriptions.any? { |subscription| subscription.user_id == user.id }
+  end
+
+  # The post's author, everyone who commented, and everyone subscribed to
+  # updates, deduped by user, in order of first appearance. Later records
+  # (e.g. a comment made after the post) fill in a nickname/avatar the
+  # earlier one didn't have, without ever overwriting one with a blank.
+  def participants
+    entries = {}
+
+    add_participant = lambda do |user_id, user_email, user_nickname, user_avatar_url|
+      existing = entries[user_id]
+      entries[user_id] = Participant.new(
+        user_id: user_id,
+        user_email: user_email,
+        user_nickname: user_nickname.presence || existing&.user_nickname,
+        user_avatar_url: user_avatar_url.presence || existing&.user_avatar_url
+      )
+    end
+
+    add_participant.call(user_id, user_email, user_nickname, user_avatar_url)
+    comments.order(:created_at).each { |comment| add_participant.call(comment.user_id, comment.user_email, comment.user_nickname, comment.user_avatar_url) }
+    subscriptions.each { |subscription| add_participant.call(subscription.user_id, subscription.user_email, subscription.user_nickname, subscription.user_avatar_url) }
+
+    entries.values
   end
 
   private
