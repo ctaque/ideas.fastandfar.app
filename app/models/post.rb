@@ -63,6 +63,14 @@ class Post < ApplicationRecord
     entries.values
   end
 
+  # Nicknames of everyone already part of this post's conversation, for seeding the
+  # "@mention" autocomplete with people relevant to this post even when the composer
+  # doesn't follow them (the fastandfarapp-backed autocomplete only knows about follow
+  # connections, not who's actually in this thread).
+  def participant_nicknames
+    participants.filter_map { |participant| participant.user_nickname.presence }
+  end
+
   private
     def not_flagged_by_moderation
       result = PostModerator.call(title, content.to_plain_text)

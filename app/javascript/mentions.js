@@ -3,16 +3,45 @@
 // match with the mouse, arrow keys + Enter/Tab, or dismiss with Escape/an outside click.
 // The API itself decides who gets emailed once the post/comment is actually saved
 // (see MentionNotifier server-side) — this file only ever inserts plain "@nickname" text.
+//
+// fastandfarapp's search is scoped to the visitor's follow connections, so it won't
+// surface someone who's only in this post's conversation (commented/subscribed) but
+// isn't followed. The trix-editor's `data-mention-participants` attribute (set by the
+// post/comment forms from `Post#participant_nicknames`) fills that gap: those nicknames
+// are matched locally, alongside whatever the API returns, so a reply can always
+// @mention anyone already part of the thread.
 
 // Requires a preceding start-of-line/whitespace so typing an email address doesn't
 // trigger the menu (matches the server-side extraction in MentionNotifier).
 const MENTION_PATTERN = /(?:^|\s)@([a-zA-Z0-9_-]{1,30})$/;
 const DEBOUNCE_MS = 150;
+const MAX_MENU_ITEMS = 8;
 
 function apiBase() {
   return document.querySelector('meta[name="fastandfarapp-origin"]')?.content;
 }
 
+function localMatches(state, query) {
+  const lowerQuery = query.toLowerCase();
+  return state.participants.filter((nickname) => nickname.toLowerCase().startsWith(lowerQuery));
+}
+
+// Combines two nickname lists, case-insensitively deduped, `primary` entries first.
+function mergeNicknames(primary, secondary) {
+  const seen = new Set(primary.map((nickname) => nickname.toLowerCase()));
+  const merged = primary.slice();
+  for (const nickname of secondary) {
+    if (!seen.has(nickname.toLowerCase())) {
+      seen.add(nickname.toLowerCase());
+      merged.push(nickname);
+    }
+  }
+  return merged.slice(0, MAX_MENU_ITEMS);
+}
+
+// Fully abandons the current mention (caret moved out of a "@query" context, blur, pick,
+// or Escape). Clears `mentionStart` — anything still showing the menu after this must not
+// try to insert relative to it.
 function closeMenu(state) {
   state.menu?.remove();
   state.menu = null;
@@ -67,7 +96,14 @@ function setupMentions(trixElement) {
   const editor = trixElement.editor;
   if (!editor || !apiBase()) return;
 
-  const state = { menu: null, items: [], activeIndex: -1, mentionStart: null };
+  let participants = [];
+  try {
+    participants = JSON.parse(trixElement.dataset.mentionParticipants || "[]");
+  } catch (e) {
+    participants = [];
+  }
+
+  const state = { menu: null, items: [], activeIndex: -1, mentionStart: null, participants };
   let debounceTimer = null;
   let requestToken = 0;
 
@@ -99,6 +135,16 @@ function setupMentions(trixElement) {
     const query = match[1];
     state.mentionStart = caret - query.length - 1; // -1 for the "@" itself
 
+    // Show local (post-participant) matches immediately, without waiting on the network,
+    // then merge in the API's follow-scoped results once they arrive. If there are no
+    // local matches (the common case), leave whatever menu is already showing alone —
+    // it'll be replaced once the debounced fetch below resolves — rather than hiding it,
+    // which would just flicker the menu closed and reopened every keystroke.
+    const localHits = localMatches(state, query);
+    if (localHits.length > 0) {
+      renderMenu(state, trixElement, localHits.slice(0, MAX_MENU_ITEMS), pick);
+    }
+
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       const token = ++requestToken;
@@ -108,13 +154,16 @@ function setupMentions(trixElement) {
         .then((response) => (response.ok ? response.json() : { nicknames: [] }))
         .then(({ nicknames }) => {
           if (token !== requestToken) return; // a newer keystroke superseded this request
-          if (!nicknames || nicknames.length === 0) {
+          const merged = mergeNicknames(localHits, nicknames || []);
+          if (merged.length === 0) {
             closeMenu(state);
             return;
           }
-          renderMenu(state, trixElement, nicknames, pick);
+          renderMenu(state, trixElement, merged, pick);
         })
-        .catch(() => closeMenu(state));
+        .catch(() => {
+          if (localHits.length === 0) closeMenu(state);
+        });
     }, DEBOUNCE_MS);
   });
 

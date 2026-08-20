@@ -44,7 +44,8 @@
 
   <div class="field">
     <%= form.label :content %>
-    <%= form.rich_text_area :content, placeholder: "Use @ to mention" %>
+    <%= form.rich_text_area :content, placeholder: "Use @ to mention",
+          data: { mention_participants: (post.participant_nicknames - [Current.user&.nickname]).to_json } %>
   </div>
 
   <% verb = post.new_record? ? "Create" : "Update" %>
