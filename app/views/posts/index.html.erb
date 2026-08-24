@@ -1,7 +1,7 @@
 <% content_for :title, "Ideas" %>
 
 <div class="container">
-  <div class="page-header" style="align-items: flex-start;">
+  <div class="page-header posts-page-header" style="align-items: flex-start;">
     <%= form_with url: posts_path, method: :get, class: "post-search-form" do %>
       <%= hidden_field_tag :sort, @sort %>
       <%= hidden_field_tag :q, @q, data: { role: "search-qualifier-value" } %>
