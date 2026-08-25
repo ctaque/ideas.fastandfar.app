@@ -1,6 +1,6 @@
 // Autosaves the post title/content form to localStorage as the visitor types, so an
 // accidental reload (or crash) doesn't lose an in-progress post. Restored on load and
-// cleared once the post is actually saved, so a later "new post" visit starts blank.
+// cleared on submit, so a later "new post" visit starts blank.
 
 function draftKey(form) {
   return `post-draft:${form.dataset.draftId}`;
@@ -31,8 +31,17 @@ function restoreDraft(form) {
 
   const { titleField, trixElement } = fieldsFor(form);
   if (titleField && typeof draft.title === "string") titleField.value = draft.title;
-  if (trixElement?.editor && typeof draft.content === "string") {
-    trixElement.editor.loadHTML(draft.content);
+
+  if (trixElement && typeof draft.content === "string") {
+    const loadContent = () => trixElement.editor.loadHTML(draft.content);
+    // trix-editor upgrades itself (and sets .editor) asynchronously, after the custom
+    // element registers - which can still be pending when this runs immediately on
+    // script load. Trix fires "trix-initialize" once .editor is actually ready.
+    if (trixElement.editor) {
+      loadContent();
+    } else {
+      trixElement.addEventListener("trix-initialize", loadContent, { once: true });
+    }
   }
 }
 
@@ -58,15 +67,20 @@ function setupPostDraft(form) {
   const { titleField, trixElement } = fieldsFor(form);
   titleField?.addEventListener("input", () => saveDraft(form));
   trixElement?.addEventListener("trix-change", () => saveDraft(form));
+
+  // This app doesn't load Turbo's JS runtime (only the turbo-rails gem, for
+  // data-turbo-track), so every navigation - including the form's own submit -
+  // is a plain full-page load rather than a Turbo visit. A regular "submit"
+  // fires synchronously before that navigation, giving us a chance to drop the
+  // draft; we can't tell here whether the server will accept it, but on a
+  // validation failure Rails re-renders the same fields with the submitted
+  // values anyway, so nothing is lost.
+  form.addEventListener("submit", () => localStorage.removeItem(draftKey(form)));
 }
 
-document.addEventListener("turbo:load", () => {
+function setupAllPostDrafts() {
   document.querySelectorAll("form[data-draft-id]").forEach(setupPostDraft);
-});
+}
 
-document.addEventListener("turbo:submit-end", (event) => {
-  const form = event.target;
-  if (form.matches?.("form[data-draft-id]") && event.detail.success) {
-    localStorage.removeItem(draftKey(form));
-  }
-});
+setupAllPostDrafts();
+document.addEventListener("turbo:load", setupAllPostDrafts);
