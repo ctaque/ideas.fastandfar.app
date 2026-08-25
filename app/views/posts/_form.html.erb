@@ -1,4 +1,4 @@
-<%= form_with(model: post) do |form| %>
+<%= form_with(model: post, html: { data: { draft_id: post.new_record? ? "new" : post.id } }) do |form| %>
   <% if post.errors.any? %>
     <div class="error-box">
       <h2><%= pluralize(post.errors.count, "error") %> prohibited this idea from being saved:</h2>

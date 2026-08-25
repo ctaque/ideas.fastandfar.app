@@ -3,3 +3,4 @@
 import "trix"
 import "@rails/actiontext"
 import "mentions"
+import "post_draft"
