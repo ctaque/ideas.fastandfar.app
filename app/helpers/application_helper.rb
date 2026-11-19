@@ -1,14 +1,15 @@
 module ApplicationHelper
   AVATAR_HUES = [ 210, 265, 330, 25, 160, 190, 45, 300 ].freeze
 
-  # Shows the user's fastandfarapp profile picture when we have one (fetched from
-  # the `avatar_url` claim in the auth cookie at the time the post/comment was
-  # created), falling back to a color seeded from the email so it stays stable
-  # even if the user changes their nickname later; the letter shown is whichever
-  # the user is displayed as (nickname when set, else email) so it matches the
-  # name next to it.
-  def avatar_for(email, nickname = nil, avatar_url = nil, size: 32)
+  # Shows the user's fastandfarapp profile picture when it's the signed-in user
+  # (read live from the `avatar_url` claim in their auth cookie — profile pictures
+  # are never stored on posts/comments/subscriptions), falling back to a color
+  # seeded from the email so it stays stable even if the user changes their
+  # nickname later; the letter shown is whichever the user is displayed as
+  # (nickname when set, else email) so it matches the name next to it.
+  def avatar_for(user_id, email, nickname = nil, size: 32)
     email = email.to_s
+    avatar_url = Current.user.avatar_url if Current.user && Current.user.id == user_id
 
     if avatar_url.present?
       image_tag avatar_url,

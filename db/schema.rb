@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -54,7 +54,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_230000) do
     t.datetime "edited_at"
     t.integer "post_id", null: false
     t.datetime "updated_at", null: false
-    t.string "user_avatar_url"
     t.string "user_email", null: false
     t.integer "user_id", null: false
     t.string "user_nickname"
@@ -68,7 +67,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_230000) do
     t.text "title"
     t.string "type", default: "idea", null: false
     t.datetime "updated_at", null: false
-    t.string "user_avatar_url"
     t.string "user_email", null: false
     t.integer "user_id", null: false
     t.string "user_nickname"
@@ -79,7 +77,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_230000) do
     t.datetime "created_at", null: false
     t.integer "post_id", null: false
     t.datetime "updated_at", null: false
-    t.string "user_avatar_url"
     t.string "user_email", null: false
     t.integer "user_id", null: false
     t.string "user_nickname"

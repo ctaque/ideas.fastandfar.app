@@ -38,7 +38,7 @@
       <div class="content-box">
         <div class="content-box-header">
           <span class="issue-meta" style="margin-bottom: 0;">
-            <%= avatar_for(@post.user_email, @post.user_nickname, @post.user_avatar_url, size: 20) %>
+            <%= avatar_for(@post.user_id, @post.user_email, @post.user_nickname, size: 20) %>
             <%= display_name_for(@post.user_email, @post.user_nickname) %> posted on <%= @post.created_at.strftime("%b %d, %Y") %>
           </span>
 

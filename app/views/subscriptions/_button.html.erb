@@ -34,7 +34,7 @@
 <ul class="participant-list">
   <% participants.each do |participant| %>
     <li class="participant-list-item">
-      <%= avatar_for(participant.user_email, participant.user_nickname, participant.user_avatar_url, size: 20) %>
+      <%= avatar_for(participant.user_id, participant.user_email, participant.user_nickname, size: 20) %>
       <span><%= display_name_for(participant.user_email, participant.user_nickname) %></span>
     </li>
   <% end %>

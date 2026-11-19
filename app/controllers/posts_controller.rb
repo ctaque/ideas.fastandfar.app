@@ -48,8 +48,7 @@ class PostsController < ApplicationController
     @post = Post.new(post_params.merge(
       user_id: Current.user.id,
       user_email: Current.user.email_address,
-      user_nickname: Current.user.nickname,
-      user_avatar_url: Current.user.avatar_url
+      user_nickname: Current.user.nickname
     ))
 
     respond_to do |format|
