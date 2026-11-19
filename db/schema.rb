@@ -12,34 +12,34 @@
 
 ActiveRecord::Schema[8.1].define(version: 2026_11_19_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
-    t.text "body"
-    t.datetime "created_at", null: false
     t.string "name", null: false
-    t.bigint "record_id", null: false
+    t.text "body"
     t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.bigint "record_id", null: false
-    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.bigint "byte_size", null: false
-    t.string "checksum"
-    t.string "content_type"
-    t.datetime "created_at", null: false
-    t.string "filename", null: false
     t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
     t.text "metadata"
     t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -50,35 +50,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_120000) do
   end
 
   create_table "comments", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "edited_at"
-    t.integer "post_id", null: false
-    t.datetime "updated_at", null: false
-    t.string "user_email", null: false
     t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "post_id", null: false
+    t.string "user_email", null: false
     t.string "user_nickname"
+    t.datetime "edited_at"
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "posts", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "status", default: "open", null: false
     t.text "title"
-    t.string "type", default: "idea", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "user_email", null: false
     t.integer "user_id", null: false
+    t.string "user_email", null: false
+    t.string "status", default: "open", null: false
+    t.string "type", default: "idea", null: false
     t.string "user_nickname"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
   create_table "subscriptions", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "post_id", null: false
-    t.datetime "updated_at", null: false
-    t.string "user_email", null: false
     t.integer "user_id", null: false
+    t.string "user_email", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "user_nickname"
     t.index ["post_id", "user_id"], name: "index_subscriptions_on_post_id_and_user_id", unique: true
     t.index ["post_id"], name: "index_subscriptions_on_post_id"
@@ -86,12 +86,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_120000) do
   end
 
   create_table "votes", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "post_id", null: false
-    t.datetime "updated_at", null: false
-    t.string "user_email", null: false
     t.integer "user_id", null: false
     t.integer "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_email", null: false
     t.index ["post_id", "user_id"], name: "index_votes_on_post_id_and_user_id", unique: true
     t.index ["post_id"], name: "index_votes_on_post_id"
     t.index ["user_id"], name: "index_votes_on_user_id"

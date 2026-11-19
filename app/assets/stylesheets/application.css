@@ -102,16 +102,11 @@ hr { border: none; border-top: 1px solid var(--color-border); margin: 24px 0; }
 }
 
 .brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #4493f8, #a371f7);
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
+  object-fit: cover;
 }
 
 .gh-header .actions {
